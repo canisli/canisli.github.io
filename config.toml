@@ -32,7 +32,7 @@ disableKinds = ["taxonomy", "term"]
     # { keybase = "https://keybase.io/username" },
     # { kickstarter = "https://www.kickstarter.com/profile/username" },
     # { lastfm = "https://lastfm.com/user/username" },
-      { linked = {href="https://www.linkedin.com/in/canis-li-819013224", text="LinkedIn" } },
+      { linked = {href="https://www.linkedin.com/in/canisli", text="LinkedIn" } },
     # { mastodon = "https://mastodon.instance/@username" },
     # { medium = "https://medium.com/username" },
     # { microsoft = "https://www.microsoft.com/" },
