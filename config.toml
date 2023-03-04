@@ -13,7 +13,7 @@ disableKinds = ["taxonomy", "term"]
   image = "canis.jpg"  # path relative to static directory
 
   links = [
-    { link = {href="/Resume_CanisLi.pdf", text="Resume"} },
+   # { link = {href="/Resume_CanisLi.pdf", text="Resume"} },
     { github = "https://github.com/canisli" },
     { linked = {href="https://www.linkedin.com/in/canisli", text="LinkedIn" } },
     { astro = {href= "astro/", text="Astrophotography"}},    
