@@ -11,7 +11,7 @@ disableKinds = ["taxonomy", "term"]
   name = "Canis Li"
   headline = """Hello! I'm a senior at Valley Christian High School interested in physics and astronomy. \
                  I'm currently researching photometric variations of stellar magnetic activity. \
-                 I'm also an avid supporter for the dark-sky movement. \
+                 I'm also an avid supporter for the dark sky movement. \
                  For fun, I play varsity volleyball and listen to j-pop and classical music. """
   image = "canis.jpg"  # path relative to static directory
 
