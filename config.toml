@@ -20,7 +20,7 @@ disableKinds = ["taxonomy", "term"]
     { github = "https://github.com/canisli" },
     { linked = {href="https://www.linkedin.com/in/canisli", text="LinkedIn" } },
     { astro = {href= "astro/", text="Astrophotography"}},    
-    { darksky = {href= "https://www.darksky.org", text="Dark Sky"}}
+    { darksky = {href= "darksky/", text="Dark Sky"}}
   ]
 
 [module]
