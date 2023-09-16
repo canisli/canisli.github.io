@@ -1,3 +1,3 @@
 ---
-description: "This is a demo of the Lynx theme for Hugo."
+description: "August 12th, 2036. The heat death of the universe."
 ---
