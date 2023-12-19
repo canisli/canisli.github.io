@@ -9,10 +9,7 @@ disableKinds = ["taxonomy", "term"]
 
 [author]
   name = "Canis Li"
-  headline = """Hello! I'm a senior at Valley Christian High School interested in physics and astronomy. \
-                 I'm currently researching photometric variations of stellar magnetic activity. \
-                 I'm also an avid supporter for the dark sky movement. \
-                 For fun, I play varsity volleyball and listen to j-pop and classical music. """
+  headline = """Hello! I'm a senior at Valley Christian High School. I love everything space-related, and my goal is to eventually end up with "astro" in my career title—astrophysicist, astrophotographer, maybe even astronaut. When I'm not busy trying to figure out how the universe works, I advocate for the dark-sky movement, listen to jpop/classical music, and play volleyball."""
   image = "canis.jpg"  # path relative to static directory
 
   links = [
@@ -20,10 +17,17 @@ disableKinds = ["taxonomy", "term"]
     { github = "https://github.com/canisli" },
     { linked = {href="https://www.linkedin.com/in/canisli", text="LinkedIn" } },
     { astro = {href= "astro/", text="Astrophotography"}},    
-    { darksky = {href= "darksky/", text="Dark Sky"}}
+    { darksky = {href= "darksky/", text="Dark-Sky"}}
   ]
 
 [module]
   [module.hugoVersion]
     extended = false
     min = "0.86.1"
+
+
+[services]
+  [services.googleAnalytics]
+    ID = 'G-T3Y23EN70G'
+
+
