@@ -15,5 +15,15 @@
 
 h2 {
   text-align: left;
+}
 
+
+.link-articles{
+	background-color: #FFFFFF;
+	color: #000000;
+	font-family: "Comic Sans MS";
+}
+
+li {
+	margin: 1px 0 !important;
 }

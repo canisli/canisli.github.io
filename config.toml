@@ -9,16 +9,19 @@ disableKinds = ["taxonomy", "term"]
 
 [author]
   name = "Canis Li"
-  headline = """Hello! I'm a senior at Valley Christian High School. I love everything space-related, and my goal is to eventually end up with "astro" in my career title—astrophysicist, astrophotographer, maybe even astronaut. When I'm not busy trying to figure out how the universe works, I advocate for the dark-sky movement, listen to nintendo music, and play volleyball."""
-  image = "canis.jpg"  # path relative to static directory
+  headline = """I'm an incoming undergraduate at MIT, having recently graduated from Valley Christian High School in San Jose, California. 
+                I love everything space-related, and my goal is to eventually end up with "astro" in my career title—astrophysicist, astrophotographer, maybe even astronaut! 
+                When I'm not busy trying to understand how the universe works, I advocate for the dark-sky movement, practice the piano, and play volleyball."""
+  image = "me2.jpg"  # path relative to static directory
 
   links = [
    # { link = {href="/Resume_CanisLi.pdf", text="Resume"} },
-    { googlescholar ={href= "https://scholar.google.com/citations?user=Pld3_bQAAAAJ", text="Google Scholar"}}, 
+    { googlescholar ={href= "https://scholar.google.com/citations?user=Pld3_bQAAAAJ", text="Publications"}}, 
     { github = {href="https://github.com/canisli", text="GitHub"}},
     { linked = {href="https://www.linkedin.com/in/canisli", text="LinkedIn" }} ,
     { astro = {href= "astro/", text="Astrophotography"}},    
-    { darksky = {href= "darksky/", text="Dark-Sky"}}
+    { darksky = {href= "darksky/", text="Dark-Sky"}},
+    { articles = {href= "articles/", text="Cool articles"}}
   ]
 
 [module]
