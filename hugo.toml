@@ -1,0 +1,27 @@
+ baseURL = "https://canis.li"
+languageCode = "en"
+defaultContentLanguage = "en"
+
+title = "Canis Li"
+
+enableEmoji = true
+disableKinds = ["taxonomy", "term"]
+
+[params.author]
+   name = "Canis Li"
+   headline = "I’m a student at MIT interested in physics and artificial intelligence. I love everything space-related, and my goal is to eventually end up with “astro” in my career title—astrophysicist, astrophotographer, maybe even astronaut! When I’m not busy trying to understand how the universe works, I advocate for the dark-sky movement, practice the piano, and play volleyball. "
+   image = "me2.jpg"  # path relative to static directory
+
+  links = [
+   # { link = {href="/Resume_CanisLi.pdf", text="Resume"} },
+    { googlescholar ={href= "https://scholar.google.com/citations?user=Pld3_bQAAAAJ", text="Publications"}}, 
+    { github = {href="https://github.com/canisli", text="GitHub"}},
+    { linked = {href="https://www.linkedin.com/in/canisli", text="LinkedIn" }} ,
+    { astro = {href= "astro/", text="Astrophotography"}},    
+    { darksky = {href= "darksky/", text="Dark-Sky"}},
+    { articles = {href= "articles/", text="Cool articles"}}
+  ]
+[module]
+  [module.hugoVersion]
+    extended = false
+    min = "0.86.1"

@@ -1,0 +1,30 @@
+.link-linked{
+  background-color: #0077b5;
+}
+
+.link-astro{
+  background-color: #06068a;
+}
+.link-googlescholar{
+  background-color: #4081EC;
+}
+
+/* .link-darksky{
+  background-color: #001135;
+} */
+
+h2 {
+  text-align: left;
+}
+
+
+.link-articles{
+	background-color: #FFFFFF;
+	color: #000000;
+	border-width:1px;
+	font-family: "Comic Sans MS";
+}
+
+li {
+	margin: 1px 0 !important;
+}

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Canis Li</title>
+    <link>https://canis.li/</link>
+    <description>Recent content on Canis Li</description>
+    <generator>Hugo</generator>
+    <language>en</language>
+    <atom:link href="https://canis.li/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Articles</title>
+      <link>https://canis.li/articles/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://canis.li/articles/</guid>
+      <description>This is my ongoing collection of interesting articles. The order is mostly arbitrary, with the exception of the first few which sparked my interest into astrophysics.&#xA;Science https://en.wikipedia.org/wiki/List_of_unsolved_problems_in_astronomy https://en.wikipedia.org/wiki/List_of_unsolved_problems_in_physics https://en.wikipedia.org/wiki/List_of_stars_that_have_unusual_dimming_periods https://en.wikipedia.org/wiki/List_of_star_extremes https://en.wikipedia.org/wiki/List_of_exoplanet_extremes https://en.wikipedia.org/wiki/Markarian&amp;rsquo;s_Chain https://en.wikipedia.org/wiki/Axis_of_evil_(cosmology) https://en.wikipedia.org/wiki/Titius–Bode_law https://en.wikipedia.org/wiki/Great_Attractor https://en.wikipedia.org/wiki/Period-luminosity_relation https://en.wikipedia.org/wiki/List_of_cloud_types https://en.wikipedia.org/wiki/Circumhorizontal_arc https://en.wikipedia.org/wiki/South_Atlantic_Anomaly https://en.wikipedia.org/wiki/Speckle_imaging https://en.wikipedia.org/wiki/Carrington_Event https://en.wikipedia.org/wiki/The_Hum https://en.wikipedia.org/wiki/Deep-sea_gigantism Math https://en.wikipedia.org/wiki/Machin-like_formula https://en.wikipedia.org/wiki/Alpha_max_plus_beta_min_algorithm https://en.wikipedia.org/wiki/Euler–Maclaurin_formula https://en.wikipedia.org/wiki/Umbral_calculus https://en.wikipedia.org/wiki/Regression_dilution https://en.wikipedia.org/wiki/Bessel&#39;s_correction https://en.wikipedia.org/wiki/Log-normal_distribution Fun Why Did the Chicken Cross the Road? On the Possibility of Discovering Exoplanets within our Solar System https://en.</description>
+    </item>
+    <item>
+      <title>Astrophotography</title>
+      <link>https://canis.li/astro/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://canis.li/astro/</guid>
+      <description> Milky Way from Lick Observatory on the summit of Mount Hamilton Moon above light polluted San Jose Milky Way from US Naval Observatory in Flagstaff, AZ. </description>
+    </item>
+    <item>
+      <title>Dark-Sky</title>
+      <link>https://canis.li/darksky/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://canis.li/darksky/</guid>
+      <description>I&amp;rsquo;m an avid supporter for the dark-sky movement, with the goal of preserving the effectiveness of astronomical ground-based observations, the circadian rhythms of nocturnal animals, and the magical beauty of the night sky for generations of poets, musicians, scientists, artists, and dreamers! As an official advocate for the International Dark-Sky association (IDA), I&amp;rsquo;m working to educate those in my community about the subtle effects of light pollutiion and push for city-wide lighting reform.</description>
+    </item>
+  </channel>
+</rss>
