@@ -1,4 +1,5 @@
- baseURL = "https://canis.li"
+baseURL = "https://canis.li"
+googleAnalytics = "G-T3Y23EN70G"
 languageCode = "en"
 defaultContentLanguage = "en"
 
