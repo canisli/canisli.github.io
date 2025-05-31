@@ -1,8 +1,6 @@
 ---
-title: Articles
+title: Cool stuff
 ---
-
-This is my ongoing collection of interesting articles. The order is mostly arbitrary, with the exception of the first few which sparked my interest into astrophysics.
 
 ### Science
 - https://en.wikipedia.org/wiki/List_of_unsolved_problems_in_astronomy
@@ -22,6 +20,7 @@ This is my ongoing collection of interesting articles. The order is mostly arbit
 - https://en.wikipedia.org/wiki/Carrington_Event
 - https://en.wikipedia.org/wiki/The_Hum
 - https://en.wikipedia.org/wiki/Deep-sea_gigantism
+- https://en.wikipedia.org/wiki/Impossible_color
 
 ### Math
 - https://en.wikipedia.org/wiki/Machin-like_formula
@@ -31,10 +30,11 @@ This is my ongoing collection of interesting articles. The order is mostly arbit
 - https://en.wikipedia.org/wiki/Regression_dilution
 - [https://en.wikipedia.org/wiki/Bessel\'s_correction](https://en.wikipedia.org/wiki/Bessel%27s_correction)
 - https://en.wikipedia.org/wiki/Log-normal_distribution
+- [Sunset Geometry](https://www.shapeoperator.com/2016/12/12/sunset-geometry/)
 
 ### Fun
 - [Why Did the Chicken Cross the Road?](https://www.physics.harvard.edu/physics/undergrad/humor)
 - [On the Possibility of Discovering Exoplanets within our Solar System](https://arxiv.org/abs/2203.17075)
-- https://en.wikipedia.org/wiki/First-move_advantage_in_chess
-- https://en.wikipedia.org/wiki/List_of_Greek_mythological_creatures
-- https://en.wikipedia.org/wiki/Nuclear_football
+- [First-move Advantage in Chess](https://en.wikipedia.org/wiki/First-move_advantage_in_chess)
+- [List of Greek Mythological Creatures](https://en.wikipedia.org/wiki/List_of_Greek_mythological_creatures)
+<!-- - https://en.wikipedia.org/wiki/Nuclear_football -->

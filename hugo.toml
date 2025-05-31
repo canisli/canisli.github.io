@@ -20,7 +20,7 @@ disableKinds = ["taxonomy", "term"]
     { linked = {href="https://www.linkedin.com/in/canisli", text="LinkedIn" }} ,
     { astro = {href= "astro/", text="Astrophotography"}},    
     { darksky = {href= "darksky/", text="Dark-Sky"}},
-    { articles = {href= "articles/", text="Cool articles"}}
+    { articles = {href= "articles/", text="Cool stuff"}}
   ]
 [module]
   [module.hugoVersion]
