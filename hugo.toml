@@ -10,7 +10,7 @@ disableKinds = ["taxonomy", "term"]
 
 [params.author]
    name = "Canis Li"
-   headline = "I’m an undergrad at MIT interested in physics and artificial intelligence. I love everything space-related, and I hope to one day become an astronaut! When I’m not busy exploring how the universe works, I advocate for the dark-sky movement, practice the piano, and play volleyball. "
+   headline = "I’m an MIT undergraduate studying physics and computer science, with a focus on statistics and artificial intelligence. Outside of academics, I advocate for dark-sky preservation, practice piano, and play volleyball."
    image = "me2.jpg"  # path relative to static directory
 
   links = [
@@ -19,8 +19,8 @@ disableKinds = ["taxonomy", "term"]
     { github = {href="https://github.com/canisli", text="GitHub"}},
     { linked = {href="https://www.linkedin.com/in/canisli", text="LinkedIn" }} ,
     { astro = {href= "astro/", text="Astrophotography"}},    
-    { darksky = {href= "darksky/", text="Dark-Sky"}},
-    { articles = {href= "articles/", text="Cool stuff"}}
+    # { darksky = {href= "darksky/", text="Dark-Sky"}},
+    { articles = {href= "articles/", text="Reading List"}}
   ]
 [module]
   [module.hugoVersion]
