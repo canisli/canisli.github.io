@@ -24,6 +24,7 @@ title: Bookmarks
 
 
 ### Math
+- [Differential Entropy](https://en.wikipedia.org/wiki/Differential_entropy)
 - [Machin-like Formula](https://en.wikipedia.org/wiki/Machin-like_formula)  
 - [Alpha Max Plus Beta Min Algorithm](https://en.wikipedia.org/wiki/Alpha_max_plus_beta_min_algorithm)  
 - [Euler–Maclaurin Formula](https://en.wikipedia.org/wiki/Euler–Maclaurin_formula)  
