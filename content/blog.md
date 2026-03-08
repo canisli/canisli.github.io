@@ -13,6 +13,9 @@ Welcome to my blog. In this blog we will be going over the pursuit of happiness 
 - Health and longevity/immortality
 - Childhood and nostalgia
 
+Stuff I'm currently pursuing
 
+- Fix lower back problems
+- Research breakthrough
 
 
