@@ -12,10 +12,12 @@ Welcome to my blog. In this blog we will be going over the pursuit of happiness 
 - Video games
 - Health and longevity/immortality
 - Childhood and nostalgia
+- Transcendentalism
 
 Stuff I'm currently pursuing
 
 - Fix lower back problems
 - Research breakthrough
+
 
 
