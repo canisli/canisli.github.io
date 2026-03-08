@@ -10,7 +10,9 @@ Welcome to my blog. In this blog we will be going over the pursuit of happiness 
 - AGI
 - Privilege and gratitude
 - Video games
-- Health and longevity
+- Health and longevity/immortality
+- Childhood and nostalgia
+
 
 
 
