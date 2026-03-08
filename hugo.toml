@@ -10,8 +10,8 @@ disableKinds = ["taxonomy", "term"]
 
 [params.author]
    name = "Canis Li"
-   headline = "I’m an MIT undergraduate studying physics and computer science, with a focus on statistics and artificial intelligence. Outside of academics, I advocate for dark-sky preservation, practice piano, and play volleyball."
-   image = "me2.jpg"  # path relative to static directory
+   headline = "I’m an MIT undergraduate studying physics and computer science, with a focus on statistics and artificial intelligence. Previously, I wrote and killed a [false-positive planet](https://exoplanetarchive.ipac.caltech.edu/overview/kepler-488b)."
+   image = "me2.png"  # path relative to static directory
 
   links = [
    # { link = {href="/Resume_CanisLi.pdf", text="Resume"} },
