@@ -1,3 +1,22 @@
+.page-background {
+  background-color: #e4f3d8;
+}
+
+html {
+  background-color: #e4f3d8;
+}
+
+@media (prefers-color-scheme: dark) {
+  .page-background,
+  html {
+    background-color: #122016;
+  }
+}
+
+.headline-description {
+  color: #000000;
+}
+
 .link-linked{
   background-color: #0077b5;
 }
