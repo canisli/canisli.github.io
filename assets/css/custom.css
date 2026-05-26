@@ -6,15 +6,25 @@ html {
   background-color: #e4f3d8;
 }
 
+.headline-description {
+  color: #000000;
+}
+
 @media (prefers-color-scheme: dark) {
   .page-background,
   html {
-    background-color: #122016;
+    background-color: rgb(31 41 55);
   }
-}
 
-.headline-description {
-  color: #000000;
+  body,
+  body .dark\:text-white {
+    color: #e5e7eb;
+  }
+
+  body .headline-name,
+  body .headline-description {
+    color: #d1d5db;
+  }
 }
 
 .link-linked{
