@@ -18,9 +18,9 @@ disableKinds = ["taxonomy", "term"]
     { googlescholar ={href= "https://scholar.google.com/citations?user=Pld3_bQAAAAJ", text="Publications"}}, 
     { github = {href="https://github.com/canisli", text="GitHub"}},
     { linked = {href="https://www.linkedin.com/in/canisli", text="LinkedIn" }} ,
-    { astro = {href= "astro/", text="Astrophotography"}},    
+    { astro = {href= "astro/", text="Astrophotography", target="_self"}},    
     # { darksky = {href= "darksky/", text="Dark-Sky"}},
-    { articles = {href= "articles/", text="Reading List"}}
+    { articles = {href= "articles/", text="Reading List", target="_self"}}
   ]
 [module]
   [module.hugoVersion]

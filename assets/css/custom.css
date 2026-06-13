@@ -6,6 +6,44 @@ html {
   background-color: #e4f3d8;
 }
 
+html.content-astro,
+body.content-astro.page-background {
+  background-color: rgb(31 41 55);
+}
+
+body.content-astro {
+  color: #e5e7eb;
+  color-scheme: dark;
+}
+
+body.content-astro .text-neutral-800,
+body.content-astro .text-neutral-900 {
+  color: #f9fafb;
+}
+
+body.content-astro .text-neutral-500 {
+  color: #9ca3af;
+}
+
+body.content-astro .prose {
+  --tw-prose-body: #d1d5db;
+  --tw-prose-headings: #f9fafb;
+  --tw-prose-lead: #d1d5db;
+  --tw-prose-links: #f9fafb;
+  --tw-prose-bold: #f9fafb;
+  --tw-prose-counters: #9ca3af;
+  --tw-prose-bullets: #9ca3af;
+  --tw-prose-hr: #374151;
+  --tw-prose-quotes: #f3f4f6;
+  --tw-prose-quote-borders: #4b5563;
+  --tw-prose-captions: #9ca3af;
+  --tw-prose-code: #f9fafb;
+  --tw-prose-pre-code: #d1d5db;
+  --tw-prose-pre-bg: rgb(17 24 39);
+  --tw-prose-th-borders: #4b5563;
+  --tw-prose-td-borders: #374151;
+}
+
 .headline-description {
   color: #000000;
 }

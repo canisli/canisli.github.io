@@ -1,0 +1,7 @@
+<h2>9. Numpy/Torch</h2>
+    <h3>9.1. Views</h3>
+    <p>Conceptually. An ndarray is a metadata object pointing into a memory buffer (everything is a view). But view usually means “an array object sharing another array’s buffer.”</p>
+    <p>In PyTorch, a view is a tensor that shares the same underlying memory as another tensor but has different shape/strides/metadata.</p>
+    <p>Commands view-producing ops:</p>
+    <pre><code data-lang="python">x.<span style="color: #4b69c6">view</span>(<span style="color: #d73948">...</span>)<br>x.<span style="color: #4b69c6">reshape</span>(<span style="color: #d73948">...</span>)      <span style="color: #74747c">#</span><span style="color: #74747c"> sometimes view, sometimes copy</span><br>x.<span style="color: #4b69c6">transpose</span>(<span style="color: #d73948">...</span>)<br>x.<span style="color: #4b69c6">unsqueeze</span>(<span style="color: #d73948">...</span>)<br>x.<span style="color: #4b69c6">expand</span>(<span style="color: #d73948">...</span>)</code></pre>
+    <p>Advanced indexing copies.</p>
