@@ -1,0 +1,4129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>scratch</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* Light mode (default) */
+    :root {
+      --bg-base: #edf2f6;
+      --bg-surface: #ffffff;
+      --bg-elevated: #f8f9fa;
+      --bg-toc: #ffffff;
+      --bg-toc-hover: #ffffff;
+      --bg-toc-active: #f8f9fa;
+      --text-primary: #18212b;
+      --text-secondary: #5a6570;
+      --text-muted: #7a8590;
+      --text-toc: #18212b;
+      --text-toc-muted: #5a6570;
+      --toc-border: #d8dee5;
+      --toc-overlay: rgba(0, 0, 0, 0.03);
+      --toc-overlay-hover: rgba(0, 0, 0, 0.05);
+      --toc-overlay-border: rgba(0, 0, 0, 0.1);
+      --toc-shadow: rgba(24, 33, 43, 0.08);
+      --toc-scrollbar: rgba(0, 0, 0, 0.15);
+      --toc-scrollbar-hover: rgba(0, 0, 0, 0.25);
+      --accent: #18212b;
+      --accent-soft: #ffffff;
+      --accent-hover: #18212b;
+      --border: #d8dee5;
+      --border-strong: #aeb8c3;
+      --box-bg: var(--bg-surface);
+      --box-border: 1px solid #000000;
+      --box-padding: 1rem 1.25rem;
+      --box-padding-y: 1rem;
+      --box-padding-x: 1.25rem;
+      --box-margin: 1.5rem 0;
+      --thm-blue-bg: #f1faff;
+      --thm-definition-bg: #ffffd3;
+      --thm-example-bg: #F5FFF4;
+      --thm-idea-bg: #fef6ff;
+      
+      /* Content accents (override as desired) */
+      --proof-guide-color: var(--text-primary); /* black in light mode */
+      --proof-highlight-bg: rgba(130, 80, 223, 0.06);
+      --proof-highlight-border: rgba(130, 80, 223, 0.45);
+      --list-marker-color: var(--text-primary); /* black in light mode */
+      --code-bg: #eef2f5;
+      --code-pre-bg: #f7f7f7;
+      --code-pre-text: #18212b;
+      --syntax-keyword: #cf222e;
+      --syntax-function: #8250df;
+      --syntax-string: #0a3069;
+      --syntax-number: #0550ae;
+      --syntax-comment: #6e7781;
+      --shadow-sm: none;
+      --shadow-md: none;
+      --math-color: #18212b;
+      
+      /* Customizable reading settings */
+      --content-font: 'DM Sans', system-ui, sans-serif;
+      --content-font-size: 1.05rem;
+      --content-line-height: 1.56;
+      --content-max-width: 860px;
+      --responsive-content-max-width: 720px;
+      --sidebar-width: 240px;
+      --sidebar-gap: 28px;
+      --desktop-layout-max-width: calc(var(--sidebar-width) + var(--sidebar-gap) + var(--content-max-width));
+
+      /* Typst HTML export spacing tokens */
+      --typst-paragraph-margin-top: 0rem;
+      --typst-paragraph-margin-bottom: 1.25rem;
+      --typst-paragraph-before-tight-list-margin-bottom: 0.25rem;
+      --typst-paragraph-before-list-margin-bottom: 0.25rem;
+      --typst-paragraph-plus-tight-list-margin-top: 0.25rem;
+
+      --typst-heading-scroll-margin-top: 24px;
+      --typst-h1-margin-top: 0rem;
+      --typst-h1-margin-bottom: 1rem;
+      --typst-h1-padding-bottom: 0.9rem;
+      --typst-h1-border-bottom-width: 1px;
+
+      --typst-h2-margin-top: 3.75rem;
+      --typst-h2-margin-bottom: 0.75rem;
+      --typst-h2-margin-bottom-before-h3: 0rem;
+      --typst-h2-section-end-gap: 3rem;
+
+      --typst-h3-margin-top: 2.5rem;
+      --typst-h3-margin-bottom: 0.5rem;
+      --typst-h3-margin-top-after-h2: 1rem;
+
+      --typst-h4-margin-top: 1.25rem;
+      --typst-h4-margin-bottom: 0.5rem;
+
+      --typst-list-indent: 1.75rem;
+      --typst-list-margin-top: 1rem;
+      --typst-list-margin-bottom: 1.5rem;
+      --typst-list-tight-margin-top: 0.5rem;
+      --typst-list-tight-margin-bottom: var(--typst-list-margin-bottom);
+
+      --typst-list-tight-item-gap: 0.15rem;
+      --typst-list-nontight-item-gap: 0.75rem;
+
+      --typst-li-margin-bottom: 0.5rem;
+      --typst-li-padding-left: 0.5rem;
+      --typst-li-paragraph-margin-top: 0rem;
+      --typst-li-paragraph-margin-bottom: 0.15rem;
+
+      --typst-nested-list-margin-top: 0.1rem;
+      --typst-nested-list-nontight-margin-top: 0.75rem;
+      --typst-nested-list-after-blankline-margin-top: 0.75rem;
+
+      --typst-list-last-in-container-margin-bottom: 0.25rem;
+
+      /* Block equation vertical spacing (controls p ↔ equation ↔ p gaps via margin collapsing) */
+      --typst-block-math-margin-y: 1.5rem;
+      --typst-block-math-scroll-margin-top: var(--typst-heading-scroll-margin-top);
+
+      /* Images / figures */ 
+      --typst-image-margin-top: 1.5rem;
+      --typst-image-margin-bottom: 1.5rem;
+      --typst-figure-margin-top: 1.5rem;
+      --typst-figure-margin-bottom: 1.5rem;
+      --typst-figcaption-margin-top: 0.5rem;
+    }
+
+    /* Dark mode - GitHub dark dimmed style */
+    [data-theme="dark"] {
+      --bg-base: #1E1E1E;
+      --bg-surface: #252932;
+      --bg-elevated: #2f3440;
+      --bg-toc: #2F343F;
+      --bg-toc-hover: #252932;
+      --bg-toc-active: #2f3440;
+      --text-primary: #e1e8ed;
+      --text-secondary: #b1bac4;
+      --text-muted: #768390;
+      --text-toc: #e1e8ed;
+      --text-toc-muted: #9ca5b0;
+      --toc-border: rgba(255, 255, 255, 0.12);
+      --toc-overlay: rgba(255, 255, 255, 0.05);
+      --toc-overlay-hover: rgba(255, 255, 255, 0.12);
+      --toc-overlay-border: rgba(255, 255, 255, 0.2);
+      --toc-shadow: rgba(0, 0, 0, 0.3);
+      --toc-scrollbar: rgba(255, 255, 255, 0.2);
+      --toc-scrollbar-hover: rgba(255, 255, 255, 0.3);
+      --accent: #e07850;
+      --accent-soft: rgba(224, 120, 80, 0.2);
+      --accent-hover: #f08860;
+      --proof-highlight-bg: rgba(210, 168, 255, 0.08);
+      --proof-highlight-border: rgba(210, 168, 255, 0.5);
+      --border: rgba(225, 232, 237, 0.15);
+      --border-strong: rgba(225, 232, 237, 0.3);
+      --box-border: 1px solid rgba(225, 232, 237, 0.34);
+      --thm-blue-bg: #20303a;
+      --thm-definition-bg: #39331f;
+      --thm-example-bg: #203528;
+      --thm-idea-bg: #362739;
+      --code-bg: #414957;
+      --code-pre-bg: #1e1e1e;
+      --code-pre-text: #e1e8ed;
+      --syntax-keyword: #ff7b72;
+      --syntax-function: #d2a8ff;
+      --syntax-string: #a5d6ff;
+      --syntax-number: #79c0ff;
+      --syntax-comment: #8b949e;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.2);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.3);
+      --math-color: #e1e8ed;
+    }
+
+    /* System preference detection - GitHub dark dimmed style */
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg-base: #1E1E1E;
+        --bg-surface: #252932;
+        --bg-elevated: #2f3440;
+        --bg-toc: #23272D;
+        --bg-toc-hover: #252932;
+        --bg-toc-active: #2f3440;
+        --text-primary: #e1e8ed;
+        --text-secondary: #b1bac4;
+        --text-muted: #768390;
+        --text-toc: #e1e8ed;
+        --text-toc-muted: #9ca5b0;
+        --toc-border: rgba(255, 255, 255, 0.12);
+        --toc-overlay: rgba(255, 255, 255, 0.05);
+        --toc-overlay-hover: rgba(255, 255, 255, 0.12);
+        --toc-overlay-border: rgba(255, 255, 255, 0.2);
+        --accent: #e07850;
+        --accent-soft: rgba(224, 120, 80, 0.2);
+        --accent-hover: #f08860;
+        --proof-highlight-bg: rgba(210, 168, 255, 0.08);
+        --proof-highlight-border: rgba(210, 168, 255, 0.5);
+        --border: rgba(225, 232, 237, 0.15);
+        --border-strong: rgba(225, 232, 237, 0.3);
+        --box-border: 1px solid rgba(225, 232, 237, 0.34);
+        --thm-blue-bg: #20303a;
+        --thm-definition-bg: #39331f;
+        --thm-example-bg: #203528;
+        --thm-idea-bg: #362739;
+        --code-bg: #414957;
+        --code-pre-bg: #1e1e1e;
+        --code-pre-text: #e1e8ed;
+        --syntax-keyword: #ff7b72;
+        --syntax-function: #d2a8ff;
+        --syntax-string: #a5d6ff;
+        --syntax-number: #79c0ff;
+        --syntax-comment: #8b949e;
+        --shadow-sm: 0 1px 2px rgba(0,0,0,0.2);
+        --shadow-md: 0 4px 12px rgba(0,0,0,0.3);
+        --math-color: #e1e8ed;
+        img {
+            filter: brightness(0.6);
+        }
+      }
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+    }
+
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: var(--bg-base);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: block;
+    }
+
+    /* Hide TOC list until it's built to prevent flicker */
+    .toc-list {
+      opacity: 0;
+      transition: none;
+    }
+
+    .toc-list.ready {
+      opacity: 1;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(0,0,0,0.15);
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(0,0,0,0.25);
+    }
+
+    .toc::-webkit-scrollbar-thumb {
+      background: var(--toc-scrollbar);
+    }
+
+    .toc::-webkit-scrollbar-thumb:hover {
+      background: var(--toc-scrollbar-hover);
+    }
+
+    /* Layout */
+    .reader {
+      display: grid;
+      grid-template-columns: var(--sidebar-width) minmax(0, var(--content-max-width));
+      gap: var(--sidebar-gap);
+      width: min(var(--desktop-layout-max-width), calc(100% - 36px));
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 26px 18px 46px;
+      align-items: start;
+      position: relative;
+    }
+
+    /* Table of Contents - Floating Sidebar */
+    .toc {
+      position: sticky;
+      top: 26px;
+      width: 100%;
+      max-height: calc(100vh - 36px);
+      background: var(--bg-toc);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 100;
+      border: 1px solid var(--toc-border);
+      box-shadow: none;
+    }
+
+    .toc-header {
+      padding: 16px 14px 14px;
+      border-bottom: 1px solid var(--toc-border);
+    }
+
+    .toc-title-block {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .toc-title {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-toc);
+      line-height: 1.3;
+      letter-spacing: 0;
+      margin: 0;
+    }
+
+    .toc-term {
+      display: block;
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 0.8rem;
+      font-weight: 400;
+      color: var(--text-toc-muted);
+      margin-top: 12px;
+    }
+
+    .toc-term:empty {
+      display: none;
+    }
+
+    .toc-instructor {
+      display: block;
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 0.75rem;
+      font-weight: 400;
+      color: var(--text-toc-muted);
+      margin-top: 2px;
+    }
+
+    .toc-instructor:empty {
+      display: none;
+    }
+
+    .section-jump {
+      display: none;
+      border-bottom: 1px solid var(--toc-border);
+      background: var(--bg-toc);
+      padding: 10px 14px;
+    }
+
+    .section-jump.open {
+      display: block;
+    }
+
+    .section-jump-input {
+      width: 100%;
+      border: 1px solid var(--toc-border);
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      font: inherit;
+      font-size: 0.82rem;
+      outline: none;
+      padding: 7px 8px;
+    }
+
+    .section-jump-input:focus {
+      border-color: var(--border-strong);
+    }
+
+    .section-jump-status {
+      display: block;
+      min-height: 1rem;
+      color: var(--text-toc-muted);
+      font-size: 0.72rem;
+      margin-top: 6px;
+    }
+
+    .settings-toggle {
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      border-radius: 0;
+      border: 1px solid var(--toc-border);
+      background: var(--bg-toc);
+      color: var(--text-toc-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: none;
+    }
+
+    .settings-toggle:hover,
+    .settings-toggle.active {
+      background: var(--bg-toc-active);
+      color: var(--text-toc);
+      border-color: var(--toc-border);
+    }
+
+    .settings-toggle svg {
+      transition: none;
+    }
+
+    .settings-toggle.active svg {
+      transform: rotate(90deg);
+    }
+
+    /* Settings Panel */
+    .settings-panel {
+      background: var(--bg-toc);
+      border-bottom: 1px solid var(--toc-border);
+      margin-left: -14px;
+      margin-right: -14px;
+      margin-bottom: 16px;
+      padding: 0 14px;
+      max-height: 0;
+      overflow: hidden;
+      transition: none;
+    }
+
+    .settings-panel.open {
+      max-height: 400px;
+      padding: 14px;
+      margin-bottom: 16px;
+    }
+    
+    .settings-panel:not(.open) {
+      margin-bottom: 0;
+      border-bottom: none;
+    }
+
+    .settings-section {
+      margin-bottom: 20px;
+    }
+
+    .settings-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .settings-label {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.65rem;
+      color: var(--text-toc-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .settings-options {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .settings-btn {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.75rem;
+      padding: 8px 12px;
+      border-radius: 0;
+      border: 1px solid var(--toc-border);
+      background: var(--bg-toc);
+      color: var(--text-toc-muted);
+      cursor: pointer;
+      transition: none;
+      white-space: nowrap;
+    }
+
+    .settings-btn:hover {
+      background: var(--bg-toc-active);
+      color: var(--text-toc);
+      border-color: var(--toc-border);
+    }
+
+    .settings-btn.active {
+      background: var(--bg-toc-active);
+      color: var(--text-toc);
+      border-color: var(--toc-border);
+    }
+
+    .settings-btn .icon {
+      display: inline-block;
+      margin-right: 4px;
+      font-size: 0.85em;
+    }
+
+    .toc-nav {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0px 0 16px;
+      /* Prevent scroll from leaking to parent when at top/bottom */
+      overscroll-behavior: contain;
+      /* Hide scrollbar while keeping scroll functionality */
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* IE/Edge */
+    }
+
+    .toc-nav::-webkit-scrollbar {
+      display: none; /* Chrome/Safari/Opera */
+    }
+
+    .toc-list {
+      list-style: none;
+    }
+
+    .toc-item {
+      position: relative;
+    }
+
+    .toc-link {
+      display: flex;
+      align-items: baseline;
+      padding: 5px 14px;
+      color: var(--text-toc-muted);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 400;
+      transition: none;
+      position: relative;
+      gap: 4px;
+    }
+
+    .toc-link[data-level="1"] {
+      font-weight: 600;
+      color: var(--text-toc);
+      /* padding-top: 8px; */
+      /* padding-bottom: 5px; */
+    }
+
+    .toc-link[data-level="2"] {
+      font-weight: 600;
+      color: var(--text-toc);
+      /* padding-top: 8px; */
+      /* padding-bottom: 5px; */
+      font-size: 0.875rem;
+    }
+
+    .toc-link::before {
+      content: none;
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: var(--accent);
+      opacity: 0;
+      transition: none;
+    }
+
+    .toc-link:hover {
+      color: var(--text-toc);
+      background: var(--bg-toc-hover);
+    }
+
+    .toc-link.active {
+      color: var(--text-toc);
+      background: var(--bg-toc-active);
+    }
+
+    .toc-link.section-jump-match {
+      color: var(--text-toc);
+      background: var(--accent-soft);
+      outline: 1px solid var(--border-strong);
+      outline-offset: -1px;
+    }
+
+    .toc-link.sidebar-keyboard-marker {
+      color: var(--text-toc);
+      background: var(--accent-soft);
+      outline: 1px solid var(--accent);
+      outline-offset: -1px;
+    }
+
+    .toc-number {
+      font-size: inherit;
+      color: inherit;
+      min-width: auto;
+    }
+
+    .toc-text {
+      flex: 1;
+      white-space: normal;
+      word-wrap: break-word;
+    }
+
+    .toc-link[data-level="3"] {
+      padding-left: 20px;
+      font-size: 0.8rem;
+    }
+
+    .toc-footer {
+      padding: 14px;
+      border-top: 1px solid var(--toc-border);
+    }
+
+    .toc-footer .settings-toggle {
+      width: 36px;
+      height: 36px;
+    }
+
+    .toc-mobile-toggle {
+      display: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 0;
+      border: 1px solid var(--toc-border);
+      background: var(--bg-toc);
+      color: var(--text-toc);
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      box-shadow: none;
+    }
+
+    .toc-mobile-toggle:hover {
+      background: var(--bg-toc-active);
+    }
+
+    /* Main Content */
+    .main {
+      min-width: 0;
+      min-height: auto;
+      display: block;
+    }
+
+    .content-wrapper {
+      width: 100%;
+      max-width: var(--content-max-width);
+      margin: 0;
+      padding: 42px 52px 72px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      transition: none;
+    }
+
+    /* Typst Content Styling */
+    .typst-content {
+      font-family: var(--content-font);
+      font-size: var(--content-font-size);
+      line-height: var(--content-line-height);
+      color: var(--text-primary);
+      transition: none;
+    }
+
+    /* Reset Typst's default styling while keeping structure */
+    .typst-content * {
+      max-width: 100%;
+    }
+
+    /* NOTE typst headings start at h2 so this is irrelevant */
+    .typst-content h1 {
+      font-family: var(--content-font);
+      font-size: 10rem;
+      font-weight: 650;
+      color: var(--text-primary);
+      margin-top: var(--typst-h1-margin-top);
+      margin-bottom: var(--typst-h1-margin-bottom);
+      line-height: 1.12;
+      letter-spacing: 0;
+      padding-bottom: var(--typst-h1-padding-bottom);
+      border-bottom: var(--typst-h1-border-bottom-width) solid var(--border-strong);
+      scroll-margin-top: var(--typst-heading-scroll-margin-top);
+    }
+
+    .typst-content h2 {
+      font-family: var(--content-font);
+      font-size: 1.75rem;
+      font-weight: 650;
+      color: var(--text-primary);
+      margin-top: var(--typst-h2-margin-top);
+      margin-bottom: var(--typst-h2-margin-bottom);
+      line-height: 1.25;
+      letter-spacing: 0;
+      scroll-margin-top: var(--typst-heading-scroll-margin-top);
+      position: relative;
+    }
+
+    /* Reduce h2 bottom spacing when an h3 immediately follows. */
+    .typst-content h2:has(+ h3) {
+      margin-bottom: var(--typst-h2-margin-bottom-before-h3);
+    }
+
+    .typst-content h3 {
+      font-family: var(--content-font);
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-top: var(--typst-h3-margin-top);
+      margin-bottom: var(--typst-h3-margin-bottom);
+      scroll-margin-top: var(--typst-heading-scroll-margin-top);
+    }
+
+    /* Fallback for browsers without :has(): remove the h3 top margin instead. */
+    .typst-content h2 + h3 {
+      margin-top: var(--typst-h3-margin-top-after-h2);
+    }
+
+    .typst-content h4 {
+      font-family: var(--content-font);
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-top: var(--typst-h4-margin-top);
+      margin-bottom: var(--typst-h4-margin-bottom);
+      scroll-margin-top: var(--typst-heading-scroll-margin-top);
+    }
+
+    /* Heading numbers */
+    .typst-content .heading-number {
+      color: var(--accent);
+      font-weight: 500;
+      margin-right: 0.15em;
+    }
+
+    .typst-content p {
+      margin-top: var(--typst-paragraph-margin-top);
+      margin-bottom: var(--typst-paragraph-margin-bottom);
+    }
+
+    /* Paragraph directly before a list: reduce the paragraph→list gap.
+       (Margins between consecutive blocks collapse, so we must reduce BOTH
+       the paragraph bottom margin and the list top margin in this case.) */
+    .typst-content p:has(+ ul.list-tight),
+    .typst-content p:has(+ ol.list-tight) {
+      margin-bottom: var(--typst-paragraph-before-tight-list-margin-bottom);
+    }
+
+    .typst-content p:has(+ ul.list-nontight),
+    .typst-content p:has(+ ol.list-nontight),
+    .typst-content p:has(+ ul:not(.list-tight):not(.list-nontight)),
+    .typst-content p:has(+ ol:not(.list-tight):not(.list-nontight)) {
+      margin-bottom: var(--typst-paragraph-before-list-margin-bottom);
+    }
+
+    /* Paragraph ↔ block equation spacing is controlled by `.block-math` margins. */
+
+    .typst-content strong, .typst-content b {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .typst-content em, .typst-content i {
+      font-style: italic;
+    }
+
+    .typst-content a {
+      color: var(--accent);
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 2px;
+      border-bottom: 0;
+      transition: none;
+    }
+
+    .typst-content a:hover {
+      color: var(--accent);
+    }
+
+    .typst-content code {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.85em;
+      background: var(--code-bg);
+      padding: 0.12em 0.3em;
+      margin: 0 0.08em;
+      border-radius: 3px;
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+
+    .typst-content pre {
+      background: var(--code-pre-bg);
+      border: 0;
+      border-radius: 0;
+      padding: 0.65rem 0.8rem;
+      margin: 1rem 0;
+      overflow-x: auto;
+      box-shadow: none;
+      position: relative;
+    }
+
+    .typst-content pre code {
+      background: none;
+      padding: 0;
+      margin: 0;
+      color: var(--code-pre-text);
+      font-size: 0.85rem;
+      line-height: 1.25;
+      display: block;
+      white-space: pre;
+      overflow-wrap: normal;
+      tab-size: 4;
+    }
+
+    .typst-content pre code span {
+      white-space: inherit;
+    }
+
+    .code-copy-btn {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      border: 1px solid var(--border);
+      background: var(--bg-surface);
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 0.72rem;
+      line-height: 1;
+      opacity: 0;
+      padding: 5px 7px;
+      pointer-events: none;
+      transition: none;
+    }
+
+    .typst-content pre:hover .code-copy-btn,
+    .typst-content pre:focus-within .code-copy-btn {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .code-copy-btn:hover {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+    }
+
+    .typst-content pre code span[style*="#d73948"] {
+      color: var(--syntax-keyword) !important;
+    }
+
+    .typst-content pre code span[style*="#4b69c6"] {
+      color: var(--syntax-function) !important;
+    }
+
+    .typst-content pre code span[style*="#198810"] {
+      color: var(--syntax-string) !important;
+    }
+
+    .typst-content pre code span[style*="#b60157"] {
+      color: var(--syntax-number) !important;
+    }
+
+    .typst-content pre code span[style*="#74747c"] {
+      color: var(--syntax-comment) !important;
+    }
+
+    .typst-content ul, .typst-content ol {
+      margin: var(--typst-list-margin-top) 0 var(--typst-list-margin-bottom) var(--typst-list-indent);
+    }
+
+    /* Tight lists: minimal spacing between items (Typst default) */
+    .typst-content ul.list-tight,
+    .typst-content ol.list-tight {
+      /* Use the same bottom margin as nontight lists */
+      margin: var(--typst-list-tight-margin-top) 0 var(--typst-list-tight-margin-bottom) var(--typst-list-indent);
+    }
+
+    /* If a paragraph is immediately followed by a tight list, tighten list top margin too. */
+    .typst-content p + ul.list-tight,
+    .typst-content p + ol.list-tight {
+      margin-top: var(--typst-paragraph-plus-tight-list-margin-top);
+    }
+
+    /* Item spacing should not add extra space after the list.
+       Apply the gap only between items, not after the last one. */
+    .typst-content ul.list-tight > li:not(:last-child),
+    .typst-content ol.list-tight > li:not(:last-child) {
+      margin-bottom: var(--typst-list-tight-item-gap);
+    }
+
+    .typst-content ul.list-tight > li:last-child,
+    .typst-content ol.list-tight > li:last-child {
+      margin-bottom: 0;
+    }
+
+    
+
+
+    /* Nontight lists: more spacing between items (tight: false) */
+    .typst-content ul.list-nontight,
+    .typst-content ol.list-nontight {
+      margin: var(--typst-list-margin-top) 0 var(--typst-list-margin-bottom) var(--typst-list-indent);
+    }
+
+    .typst-content ul.list-nontight > li:not(:last-child),
+    .typst-content ol.list-nontight > li:not(:last-child) {
+      margin-bottom: var(--typst-list-nontight-item-gap);
+    }
+
+    .typst-content ul.list-nontight > li:last-child,
+    .typst-content ol.list-nontight > li:last-child {
+      margin-bottom: 0;
+    }
+
+    /* List items often contain paragraphs in Typst HTML export.
+       Remove the global paragraph bottom margin inside list items to avoid
+       a huge gap between a parent bullet and its nested list. */
+    .typst-content ul > li > p,
+    .typst-content ol > li > p {
+      margin-top: var(--typst-li-paragraph-margin-top);
+      margin-bottom: var(--typst-li-paragraph-margin-bottom);
+    }
+
+    .typst-content ul > li > p:last-child,
+    .typst-content ol > li > p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Nested lists: tight spacing by default (parent -> child should be tight) */
+    .typst-content li > ul.list-tight,
+    .typst-content li > ol.list-tight {
+      margin-top: var(--typst-nested-list-margin-top);
+      margin-bottom: 0;
+    }
+
+    .typst-content li > ul.list-nontight,
+    .typst-content li > ol.list-nontight {
+      margin-top: var(--typst-nested-list-nontight-margin-top);
+      margin-bottom: 0;
+    }
+
+    /* If a list item contains an extra paragraph block before the nested list
+       (common outcome of an explicit blank line), allow a larger gap. */
+    .typst-content li > p + p + ul.list-tight,
+    .typst-content li > p + p + ul.list-nontight,
+    .typst-content li > p + p + ol.list-tight,
+    .typst-content li > p + p + ol.list-nontight {
+      margin-top: var(--typst-nested-list-after-blankline-margin-top);
+    }
+
+    .typst-content li {
+      margin-bottom: var(--typst-li-margin-bottom);
+      padding-left: var(--typst-li-padding-left);
+    }
+
+    .typst-content li::marker {
+      color: var(--list-marker-color);
+    }
+
+    /* Remove trailing list margin when it is the last element in a section
+       (i.e. immediately before the next heading) or at the end of content. */
+    .typst-content > ul:has(+ h2),
+    .typst-content > ul:has(+ h3),
+    .typst-content > ul:has(+ h4),
+    .typst-content > ol:has(+ h2),
+    .typst-content > ol:has(+ h3),
+    .typst-content > ol:has(+ h4),
+    .typst-content > ul:last-child,
+    .typst-content > ol:last-child {
+      margin-bottom: var(--typst-list-last-in-container-margin-bottom);
+    }
+
+    .typst-content blockquote {
+      border: var(--box-border);
+      padding: var(--box-padding);
+      margin: var(--box-margin);
+      background: var(--box-bg);
+      border-radius: 0;
+    }
+
+    .typst-content blockquote p {
+      margin-bottom: 0;
+      font-style: normal;
+      color: var(--text-primary);
+    }
+
+    .typst-content hr {
+      border: none;
+      height: 1px;
+      background: var(--border);
+      margin: 3rem 0;
+    }
+
+    .typst-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.75rem 0;
+      font-size: 0.95rem;
+    }
+
+    .typst-content th, .typst-content td {
+      padding: 9px 10px;
+      text-align: left;
+      border: 1px solid var(--border);
+    }
+
+    .typst-content th {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600;
+      color: var(--text-primary);
+      background: var(--bg-elevated);
+    }
+
+    .typst-content tr:hover td {
+      background: transparent;
+    }
+
+    /* Math styling - Typst renders math as SVG */
+    .typst-content svg.typst-frame {
+      vertical-align: 0.0em;
+      display: inline-block;
+    }
+
+    /* Inline math wrapper spans - vertical-align set by JS for tall elements */
+
+    /* Thicken math glyphs slightly to match PDF appearance */
+    .typst-content svg.typst-frame use {
+      stroke: var(--math-color);
+      stroke-width: 0.2px; /* Wtf this fixed it? */
+      paint-order: stroke fill;
+    }
+
+    /* Block math centering with equation numbers */
+    .typst-content .block-math {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: var(--typst-block-math-margin-y) 0;
+      width: 100%;
+      position: relative;
+      scroll-margin-top: var(--typst-block-math-scroll-margin-top);
+    }
+    .typst-content .block-math .eq-content {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+    }
+    .typst-content .block-math .eq-number {
+      position: absolute;
+      right: 0;
+      color: var(--math-color);
+      font-family: var(--content-font);
+      font-size: var(--content-font-size);
+    }
+
+    /* Legacy: direct SVG children (for backward compatibility) */
+    .typst-content p > svg.typst-frame:only-child,
+    .typst-content > svg.typst-frame {
+      display: block;
+      margin: 1.5rem auto;
+    }
+
+    /* Fix math colors - adapt to theme */
+    .typst-content svg.typst-frame [fill="#000000"],
+    .typst-content svg.typst-frame use,
+    .typst-content svg.typst-frame g {
+      fill: var(--math-color) !important;
+    }
+
+    .typst-content svg.typst-frame [stroke="#000000"] {
+      stroke: var(--math-color) !important;
+    }
+
+    .typst-content svg.typst-frame path {
+      fill: var(--math-color) !important;
+    }
+
+    /* Images */
+    .typst-content img {
+      max-width: 100%;
+      height: auto;
+      border: 0;
+      border-radius: 0;
+      margin: var(--typst-image-margin-top) auto var(--typst-image-margin-bottom);
+      display: block;
+    }
+
+    /* Figures */
+    .typst-content .figure {
+      margin-top: var(--typst-figure-margin-top);
+      margin-bottom: var(--typst-figure-margin-bottom);
+      padding: 0;
+      border: 0;
+      background: transparent;
+      text-align: center;
+    }
+
+    .typst-content .figure .figure-content {
+      display: flex;
+      justify-content: center;
+    }
+
+    /* Avoid double vertical margins (figure margin + img margin) */
+    .typst-content .figure img {
+      margin: 0 auto;
+    }
+
+    .typst-content .figure figcaption {
+      margin-top: var(--typst-figcaption-margin-top);
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      font-style: italic;
+    }
+
+    /* Scroll margin for figure targets */
+    .typst-content .figure[id] {
+      scroll-margin-top: 24px;
+    }
+
+    /* Theorem Boxes */
+    .typst-content .thm-box {
+      margin: var(--box-margin);
+      padding: var(--box-padding);
+      border: var(--box-border);
+      border-radius: 0;
+      background: var(--box-bg);
+    }
+
+    .typst-content .thm-box-title {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600;
+      font-size: 1rem;
+      color: inherit;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .typst-content .thm-box p:last-child {
+      margin-bottom: 0;
+    }
+
+    .typst-content .thm-box > ul:last-child,
+    .typst-content .thm-box > ol:last-child {
+      margin-bottom: var(--typst-list-last-in-container-margin-bottom);
+    }
+
+    /* Proof (toggleable; emitted as <details class="proof-box"> in HTML export) */
+    .typst-content details.proof-box {
+      margin: 1.25rem 0;
+      border: 0;
+      background: transparent;
+    }
+
+    .typst-content details.proof-box:not(.toggle-box) {
+      padding: 0.65rem 0.9rem;
+      border-left: 3px solid var(--proof-highlight-border);
+      background: var(--proof-highlight-bg);
+    }
+
+    .typst-content details.proof-box > summary {
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--text-primary);
+      user-select: none;
+      list-style: none;
+      outline: none;
+    }
+
+    .typst-content details.proof-box > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .typst-content details.proof-box > summary::before {
+      content: '▸';
+      display: inline-block;
+      color: var(--text-secondary);
+      transform: translateY(-0.02em);
+    }
+
+    .typst-content details.proof-box[open] > summary::before {
+      content: '▾';
+    }
+
+    /* No divider line under the proof header */
+
+    .typst-content .proof-box-body {
+      /* extra breathing room after the summary line */
+      padding: 0.75rem 0 0;
+    }
+
+    .typst-content .proof-box-body > p:last-child {
+      margin-bottom: 0;
+    }
+
+    .typst-content .proof-box-body > ul:last-child,
+    .typst-content .proof-box-body > ol:last-child {
+      margin-bottom: var(--typst-list-last-in-container-margin-bottom);
+    }
+
+    .typst-content details.proof-box > summary:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    /* `#toggle[...]` uses the same markup/style as proof toggles. */
+
+    /* QED square - render at end of the final proof line.
+       We do this by wrapping paragraph content into `.qed-text` (JS),
+       then using flex to push the QED box to the right without creating
+       a new paragraph line. */
+    .typst-content p.has-qed {
+      display: flex;
+      align-items: flex-end;
+      gap: 0.75em;
+    }
+
+    .typst-content p.has-qed > .qed-text {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    .typst-content p.has-qed > span.qed {
+      flex: 0 0 auto;
+      white-space: nowrap;
+    }
+
+    /* QED in standalone paragraph (when proof ends with block element) */
+    .typst-content .qed-paragraph {
+      text-align: right;
+      margin-top: -0.5em; /* Tighten spacing since QED follows content */
+    }
+
+    /* Theorem */
+    .typst-content .thm-theorem {
+      --thm-accent: var(--text-primary);
+      background: var(--thm-blue-bg);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) .typst-content .thm-theorem {
+        background: var(--thm-blue-bg);
+      }
+    }
+    [data-theme="dark"] .typst-content .thm-theorem {
+      background: var(--thm-blue-bg);
+    }
+    /* Lemma */
+    .typst-content .thm-lemma {
+      --thm-accent: var(--text-primary);
+      background: var(--thm-blue-bg);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) .typst-content .thm-lemma {
+        background: var(--thm-blue-bg);
+      }
+    }
+    [data-theme="dark"] .typst-content .thm-lemma {
+      background: var(--thm-blue-bg);
+    }
+    /* Proposition */
+    .typst-content .thm-proposition {
+      --thm-accent: var(--text-primary);
+      background: var(--thm-blue-bg);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) .typst-content .thm-proposition {
+        background: var(--thm-blue-bg);
+      }
+    }
+    [data-theme="dark"] .typst-content .thm-proposition {
+      background: var(--thm-blue-bg);
+    }
+    /* Corollary (same colors as Proposition) */
+    .typst-content .thm-corollary {
+      --thm-accent: var(--text-primary);
+      background: var(--thm-blue-bg);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) .typst-content .thm-corollary {
+        background: var(--thm-blue-bg);
+      }
+    }
+    [data-theme="dark"] .typst-content .thm-corollary {
+      background: var(--thm-blue-bg);
+    }
+    /* Definition */
+    .typst-content .thm-definition {
+      --thm-accent: var(--text-primary);
+      background: var(--thm-definition-bg);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) .typst-content .thm-definition {
+        background: var(--thm-definition-bg);
+      }
+    }
+    [data-theme="dark"] .typst-content .thm-definition {
+      background: var(--thm-definition-bg);
+    }
+    /* Fact */
+    .typst-content .thm-fact {
+      --thm-accent: var(--text-primary);
+      background: var(--box-bg);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) .typst-content .thm-fact {
+        background: var(--box-bg);
+      }
+    }
+    [data-theme="dark"] .typst-content .thm-fact {
+      background: var(--box-bg);
+    }
+    /* Example */
+    .typst-content .thm-example {
+      --thm-accent: var(--text-primary);
+      background: var(--thm-example-bg);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) .typst-content .thm-example {
+        background: var(--thm-example-bg);
+      }
+    }
+    [data-theme="dark"] .typst-content .thm-example {
+      background: var(--thm-example-bg);
+    }
+    /* Idea */
+    .typst-content .thm-idea {
+      --thm-accent: var(--text-primary);
+      background: var(--thm-idea-bg);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) .typst-content .thm-idea {
+        background: var(--thm-idea-bg);
+      }
+    }
+    [data-theme="dark"] .typst-content .thm-idea {
+      background: var(--thm-idea-bg);
+    }
+
+    /* Content box (generic bordered box) #Box */
+    .typst-content .content-box {
+      border: var(--box-border);
+      padding: var(--box-padding);
+      margin: var(--box-margin);
+      background: var(--box-bg);
+    }
+
+    .typst-content .content-box > *:last-child,
+    .typst-content .content-box > p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Horizontal lines */
+    .typst-content hr.hline {
+      border: none;
+      height: 1px;
+      background: var(--text-primary);
+      margin: 0.5rem 0rem;
+    }
+
+    .typst-content hr.dline {
+      border: none;
+      height: 1px;
+      background: transparent;
+      border-top: 1px dotted var(--text-primary);
+      margin: 0.5rem 0;
+    }
+
+    /* Footnotes */
+    .typst-content .footnote-marker {
+      font-size: 0.75em;
+      vertical-align: super;
+      line-height: 0;
+      margin: 0 0.1em;
+      color: var(--accent);
+      cursor: help;
+    }
+    .typst-content .footnote-ref {
+      text-decoration: none;
+      font-weight: 500;
+      color: inherit;
+    }
+    .typst-content .footnote-content {
+      display: none !important;
+    }
+    /* Footnote tooltip on hover */
+    .typst-content .footnote-marker {
+      position: relative;
+    }
+    .typst-content .footnote-marker:hover .footnote-tooltip {
+      display: block;
+    }
+    .footnote-tooltip {
+      display: none;
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      border-radius: 0;
+      padding: 12px 16px;
+      min-width: 280px;
+      max-width: 450px;
+      box-shadow: none;
+      z-index: 1000;
+      font-size: 1rem;
+      line-height: 1.6;
+      text-align: left;
+      white-space: normal;
+      cursor: auto;
+      /* Reset font properties since parent is small */
+      font-weight: normal;
+      vertical-align: baseline;
+      color: var(--text-primary);
+    }
+    .footnote-tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: var(--border-strong);
+    }
+    /* Footnotes section at bottom (toggleable) */
+    details.footnotes-section {
+      margin-top: 4rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+    }
+
+    details.footnotes-section > summary {
+      cursor: pointer;
+      user-select: none;
+      list-style: none;
+      outline: none;
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    details.footnotes-section > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.footnotes-section > summary::after {
+      content: '▸';
+      color: var(--text-muted);
+      flex: 0 0 auto;
+    }
+    details.footnotes-section[open] > summary::after {
+      content: '▾';
+    }
+
+    details.footnotes-section > ol {
+      margin: 0;
+      padding-left: 1.5rem;
+    }
+    details.footnotes-section li {
+      margin-bottom: 0.75rem;
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+    }
+    details.footnotes-section li::marker {
+      color: var(--list-marker-color);
+    }
+
+    /* Hide Typst's default footnote rendering */
+    .typst-content > section[role="doc-endnotes"],
+    .typst-content > aside.footnotes,
+    .typst-content > .footnotes:not(.footnotes-section),
+    .typst-content > hr + ol,
+    .typst-content > div.footnotes,
+    /* Same selectors through .page-section wrapper (paged-sections mode) */
+    .typst-content > .page-section > section[role="doc-endnotes"],
+    .typst-content > .page-section > aside.footnotes,
+    .typst-content > .page-section > .footnotes:not(.footnotes-section),
+    .typst-content > .page-section > hr + ol,
+    .typst-content > .page-section > div.footnotes,
+    .typst-content > .page-section > hr:last-of-type,
+    .typst-content [role="doc-endnote"],
+    .typst-content [role="doc-endnotes"],
+    .typst-content aside[role="note"],
+    .typst-content .typst-footnote-entry,
+    .typst-content > hr:last-of-type {
+      display: none;
+    }
+
+    /* Outline/TOC in content - hide it since we have sidebar */
+    .typst-content nav[role="doc-toc"],
+    .typst-content .outline {
+      display: none;
+    }
+
+    /* Highlight effect for scrollspy */
+    .section-highlight {
+      animation: highlight 1.5s ease;
+    }
+
+    @keyframes highlight {
+      0% { background: var(--accent-soft); }
+      100% { background: transparent; }
+    }
+
+    .toc-overlay {
+      display: none;
+    }
+
+    .search-panel {
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      width: min(520px, calc(100vw - 32px));
+      max-height: min(520px, calc(100vh - 36px));
+      transform: translateX(-50%);
+      display: none;
+      flex-direction: column;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      z-index: 220;
+    }
+
+    .search-panel.open {
+      display: flex;
+    }
+
+    .search-row {
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .search-input {
+      flex: 1;
+      min-width: 0;
+      border: 0;
+      background: transparent;
+      color: var(--text-primary);
+      font: inherit;
+      padding: 10px 12px;
+      outline: none;
+    }
+
+    .search-count {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      padding: 0 10px;
+      white-space: nowrap;
+    }
+
+    .search-close {
+      border: 0;
+      border-left: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-primary);
+      cursor: pointer;
+      font: inherit;
+      padding: 10px 12px;
+    }
+
+    .search-results {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      overflow-y: auto;
+    }
+
+    .search-result {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .search-result button {
+      display: block;
+      width: 100%;
+      border: 0;
+      background: transparent;
+      color: var(--text-primary);
+      cursor: pointer;
+      font: inherit;
+      padding: 10px 12px;
+      text-align: left;
+    }
+
+    .search-result button:hover,
+    .search-result.active button {
+      background: var(--bg-elevated);
+    }
+
+    .search-result-title {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .search-result-snippet {
+      display: block;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.35;
+    }
+
+    .search-result-snippet mark {
+      background: var(--thm-definition-bg);
+      color: inherit;
+      padding: 0 1px;
+    }
+
+    .search-empty {
+      color: var(--text-muted);
+      padding: 12px;
+    }
+
+    .keybinds-panel {
+      position: fixed;
+      inset: 0;
+      z-index: 240;
+      display: none;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 72px 16px 16px;
+      background: rgba(0, 0, 0, 0.18);
+    }
+
+    .keybinds-panel.open {
+      display: flex;
+    }
+
+    .keybinds-dialog {
+      width: min(420px, 100%);
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+    }
+
+    .keybinds-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .keybinds-title {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .keybinds-close {
+      border: 0;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      font: inherit;
+      padding: 4px 0;
+    }
+
+    .keybinds-close:hover {
+      color: var(--text-primary);
+    }
+
+    .keybinds-list {
+      display: grid;
+      gap: 0;
+      padding: 6px 0;
+    }
+
+    .keybinds-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 9px 14px;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.86rem;
+    }
+
+    .keybinds-row:last-child {
+      border-bottom: 0;
+    }
+
+    .keybinds-action {
+      color: var(--text-secondary);
+    }
+
+    .keybinds-keys {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+      color: var(--text-primary);
+      font-family: 'IBM Plex Mono', 'Consolas', monospace;
+      font-size: 0.78rem;
+      white-space: nowrap;
+    }
+
+    .keybinds-key {
+      min-width: 24px;
+      padding: 2px 6px;
+      border: 1px solid var(--border-strong);
+      background: var(--bg-elevated);
+      text-align: center;
+    }
+
+    /* Responsive */
+    @media (max-width: 1164px) {
+      .reader {
+        display: block;
+        width: 100%;
+        min-height: 100vh;
+        padding: 16px 14px 88px;
+      }
+
+      .toc {
+        position: fixed;
+        left: 16px;
+        top: 16px;
+        bottom: 16px;
+        width: min(280px, calc(100vw - 32px));
+        max-height: none;
+        box-shadow: none;
+        transform: translateX(calc(-100% - 24px));
+        transition: none;
+      }
+
+      .toc.open {
+        transform: translateX(0);
+      }
+
+      .main {
+        margin-left: 0;
+      }
+
+      .content-wrapper {
+        width: 100%;
+        max-width: min(var(--content-max-width), var(--responsive-content-max-width));
+        margin: 0 auto;
+        min-height: auto;
+        padding: 32px 22px 56px;
+        border: 1px solid var(--border);
+      }
+
+      .toc-overlay {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.5);
+        opacity: 0;
+        visibility: hidden;
+        transition: none;
+        z-index: 99;
+      }
+
+      .toc-overlay.open {
+        opacity: 1;
+        visibility: visible;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .toc-mobile-toggle {
+        display: flex;
+        position: fixed;
+        bottom: 16px;
+        right: 16px;
+        z-index: 101;
+      }
+    }
+
+    /* ── Paged sections (opt-in via Typst page-sections flag) ── */
+    .page-section {
+      display: none;
+      padding-bottom: var(--typst-h2-section-end-gap);
+    }
+    .page-section.active {
+      display: block;
+      animation: pageSectionFadeIn 0.15s ease;
+    }
+    @keyframes pageSectionFadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+  </style>
+  <script>
+    // Apply settings synchronously before page render to prevent flash
+    (function() {
+      try {
+        const saved = localStorage.getItem('typst-reader-settings');
+        if (saved) {
+          const settings = JSON.parse(saved);
+          const root = document.documentElement;
+          
+          // Presets (must match the ones in TypstReader class)
+          const presets = {
+            font: {
+              classic: { family: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif", size: '1rem' },
+              modern: { family: "'DM Sans', system-ui, sans-serif", size: '1.05rem' },
+              literary: { family: "'Crimson Text', 'Times New Roman', serif", size: '1.15rem' },
+              technical: { family: "'IBM Plex Mono', 'Consolas', monospace", size: '0.95rem' }
+            },
+            spacing: {
+              compact: '1.5',
+              normal: '1.56',
+              relaxed: '2'
+            },
+            width: {
+              narrow: '720px',
+              normal: '860px',
+              wide: '1000px'
+            }
+          };
+          
+          // Apply theme
+          if (settings.theme && settings.theme !== 'auto') {
+            root.setAttribute('data-theme', settings.theme);
+          }
+          
+          // Apply font
+          if (settings.font && presets.font[settings.font]) {
+            const fontPreset = presets.font[settings.font];
+            root.style.setProperty('--content-font', fontPreset.family);
+            root.style.setProperty('--content-font-size', fontPreset.size);
+          }
+          
+          // Apply spacing
+          if (settings.spacing && presets.spacing[settings.spacing]) {
+            root.style.setProperty('--content-line-height', presets.spacing[settings.spacing]);
+          }
+          
+          // Apply width
+          if (settings.width && presets.width[settings.width]) {
+            root.style.setProperty('--content-max-width', presets.width[settings.width]);
+          }
+        }
+      } catch (e) {
+        // Silently fail if localStorage is unavailable or settings are invalid
+      }
+    })();
+  </script>
+</head>
+<body>
+  <div class="reader">
+    <button class="toc-mobile-toggle" id="toc-mobile-toggle" type="button" aria-label="Show sidebar" aria-controls="toc" aria-expanded="false">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <line x1="4" y1="6" x2="20" y2="6"></line>
+        <line x1="4" y1="12" x2="20" y2="12"></line>
+        <line x1="4" y1="18" x2="20" y2="18"></line>
+      </svg>
+    </button>
+
+    <!-- Table of Contents Sidebar -->
+    <aside class="toc" id="toc">
+      <header class="toc-header">
+        <div class="toc-title-block">
+          <h1 class="toc-title" id="toc-title">scratch</h1>
+          <span class="toc-term"></span>
+          <span class="toc-instructor"></span>
+        </div>
+      </header>
+      <div class="section-jump" id="section-jump">
+        <input class="section-jump-input" id="section-jump-input" type="search" autocomplete="off" spellcheck="false" placeholder="Section name or number">
+        <span class="section-jump-status" id="section-jump-status"></span>
+      </div>
+      <nav class="toc-nav">
+        <ul class="toc-list" id="toc-list">
+          <!-- Generated dynamically -->
+        </ul>
+      </nav>
+      <div class="toc-footer">
+        <!-- Settings Panel -->
+        <div class="settings-panel" id="settings-panel">
+          <div class="settings-section">
+            <span class="settings-label">Appearance</span>
+            <div class="settings-options" data-setting="theme">
+              <button class="settings-btn" data-value="light"><span class="icon">☀️</span>Light</button>
+              <button class="settings-btn" data-value="dark"><span class="icon">🌙</span>Dark</button>
+              <button class="settings-btn" data-value="auto"><span class="icon">💻</span>Auto</button>
+            </div>
+          </div>
+          
+          <div class="settings-section">
+            <span class="settings-label">Typeface</span>
+            <div class="settings-options" data-setting="font">
+              <button class="settings-btn" data-value="classic">Classic</button>
+              <button class="settings-btn" data-value="modern">Modern</button>
+              <button class="settings-btn" data-value="literary">Literary</button>
+              <button class="settings-btn" data-value="technical">Technical</button>
+            </div>
+          </div>
+          
+          <div class="settings-section">
+            <span class="settings-label">Spacing</span>
+            <div class="settings-options" data-setting="spacing">
+              <button class="settings-btn" data-value="compact">Compact</button>
+              <button class="settings-btn" data-value="normal">Normal</button>
+              <button class="settings-btn" data-value="relaxed">Relaxed</button>
+            </div>
+          </div>
+          
+          <div class="settings-section">
+            <span class="settings-label">Width</span>
+            <div class="settings-options" data-setting="width">
+              <button class="settings-btn" data-value="narrow">Narrow</button>
+              <button class="settings-btn" data-value="normal">Normal</button>
+              <button class="settings-btn" data-value="wide">Wide</button>
+            </div>
+          </div>
+        </div>
+        <button class="settings-toggle" id="settings-toggle" aria-label="Reading settings">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Mobile overlay -->
+    <div class="toc-overlay" id="toc-overlay"></div>
+
+    <div class="search-panel" id="search-panel" role="search">
+      <div class="search-row">
+        <input class="search-input" id="search-input" type="search" autocomplete="off" spellcheck="false" placeholder="Search">
+        <span class="search-count" id="search-count"></span>
+        <button class="search-close" id="search-close" type="button" aria-label="Close search">Close</button>
+      </div>
+      <ul class="search-results" id="search-results"></ul>
+    </div>
+
+    <div class="keybinds-panel" id="keybinds-panel" role="dialog" aria-modal="true" aria-labelledby="keybinds-title" aria-hidden="true">
+      <div class="keybinds-dialog">
+        <div class="keybinds-header">
+          <h2 class="keybinds-title" id="keybinds-title">Keybinds</h2>
+          <button class="keybinds-close" id="keybinds-close" type="button" aria-label="Close keybinds">Close</button>
+        </div>
+        <div class="keybinds-list">
+          <div class="keybinds-row">
+            <span class="keybinds-action">Open keybinds</span>
+            <span class="keybinds-keys"><span class="keybinds-key">Cmd</span><span>+</span><span class="keybinds-key">/</span></span>
+          </div>
+          <div class="keybinds-row">
+            <span class="keybinds-action">Search notes</span>
+            <span class="keybinds-keys"><span class="keybinds-key">Ctrl</span><span>+</span><span class="keybinds-key">X</span></span>
+          </div>
+          <div class="keybinds-row">
+            <span class="keybinds-action">Toggle sidebar</span>
+            <span class="keybinds-keys"><span class="keybinds-key">Ctrl</span><span>+</span><span class="keybinds-key">S</span></span>
+          </div>
+          <div class="keybinds-row">
+            <span class="keybinds-action">Jump to section</span>
+            <span class="keybinds-keys"><span class="keybinds-key">/</span></span>
+          </div>
+          <div class="keybinds-row">
+            <span class="keybinds-action">Refresh content</span>
+            <span class="keybinds-keys"><span class="keybinds-key">Ctrl</span><span>+</span><span class="keybinds-key">R</span></span>
+          </div>
+          <div class="keybinds-row">
+            <span class="keybinds-action">Back</span>
+            <span class="keybinds-keys"><span class="keybinds-key">Ctrl</span><span>+</span><span class="keybinds-key">[</span></span>
+          </div>
+          <div class="keybinds-row">
+            <span class="keybinds-action">Forward</span>
+            <span class="keybinds-keys"><span class="keybinds-key">Ctrl</span><span>+</span><span class="keybinds-key">]</span></span>
+          </div>
+          <div class="keybinds-row">
+            <span class="keybinds-action">Close panel</span>
+            <span class="keybinds-keys"><span class="keybinds-key">Esc</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main">
+      <div class="content-wrapper">
+        <article class="typst-content" id="typst-content">
+          <!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <div id="page-sections-flag" style="display:none"></div>
+  </body>
+</html>
+
+        </article>
+      </div>
+    </main>
+
+    <script>
+      // Number headings synchronously before render to prevent flicker
+      (function() {
+        const content = document.getElementById('typst-content');
+        if (!content) return;
+        
+        const headingElements = content.querySelectorAll('h1.numbered-heading, h2.numbered-heading, h3.numbered-heading, h4.numbered-heading');
+        const counters = [0, 0, 0, 0];
+        
+        headingElements.forEach((el) => {
+          // Skip if already has a heading-number span
+          if (el.querySelector('.heading-number')) return;
+          
+          const dataLevel = el.getAttribute('data-level');
+          const level = dataLevel ? parseInt(dataLevel) : parseInt(el.tagName[1]);
+          const text = el.textContent.trim();
+          
+          // Skip if already has a number prefix in text
+          if (text.match(/^([\d.]+)\s*/)) return;
+          
+          // Increment counter at current level
+          const levelIdx = level - 1;
+          counters[levelIdx]++;
+          // Reset deeper level counters
+          for (let i = levelIdx + 1; i < counters.length; i++) {
+            counters[i] = 0;
+          }
+          // Build number string
+          const number = counters.slice(0, level).filter(n => n > 0).join('.');
+          if (number) {
+            el.innerHTML = `<span class="heading-number">${number}.</span> ${el.innerHTML}`;
+          }
+        });
+      })();
+    </script>
+
+  </div>
+
+  <script>
+    class TypstReader {
+      constructor() {
+        this.toc = document.getElementById('toc');
+        this.tocList = document.getElementById('toc-list');
+        this.tocTitle = document.getElementById('toc-title');
+        this.tocOverlay = document.getElementById('toc-overlay');
+        this.mobileTocToggle = document.getElementById('toc-mobile-toggle');
+        this.sectionJump = document.getElementById('section-jump');
+        this.sectionJumpInput = document.getElementById('section-jump-input');
+        this.sectionJumpStatus = document.getElementById('section-jump-status');
+        this.settingsToggle = document.getElementById('settings-toggle');
+        this.settingsPanel = document.getElementById('settings-panel');
+        this.content = document.getElementById('typst-content');
+        this.contentWrapper = document.querySelector('.content-wrapper');
+        this.searchPanel = document.getElementById('search-panel');
+        this.searchInput = document.getElementById('search-input');
+        this.searchResultsEl = document.getElementById('search-results');
+        this.searchCount = document.getElementById('search-count');
+        this.searchClose = document.getElementById('search-close');
+        this.keybindsPanel = document.getElementById('keybinds-panel');
+        this.keybindsClose = document.getElementById('keybinds-close');
+        
+        this.headings = [];
+        this.pageSections = false;
+        this.pageSectionEls = null;
+        this.searchMatches = [];
+        this.activeSearchIndex = -1;
+        this.sectionJumpMatches = [];
+        this.activeSectionJumpIndex = -1;
+        this.sidebarMarkerIndex = -1;
+        this.sidebarMarkerIsImplicit = false;
+        this._hashChangeAttached = false;
+        this._navBackStack = [];
+        this._navForwardStack = [];
+        
+        // Setting presets
+        this.presets = {
+          font: {
+            classic: { family: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif", size: '1rem' },
+            modern: { family: "'DM Sans', system-ui, sans-serif", size: '1.05rem' },
+            literary: { family: "'Crimson Text', 'Times New Roman', serif", size: '1.15rem' },
+            technical: { family: "'IBM Plex Mono', 'Consolas', monospace", size: '0.95rem' }
+          },
+          spacing: {
+            compact: '1.5',
+            normal: '1.56',
+            relaxed: '2'
+          },
+          width: {
+            narrow: '720px',
+            normal: '860px',
+            wide: '1000px'
+          }
+        };
+        
+        // Default settings
+        this.settings = {
+          theme: 'auto',
+          font: 'modern',
+          spacing: 'compact',
+          width: 'normal'
+        };
+        
+        this.init();
+      }
+
+      init() {
+        this.cleanPlaceholders();
+        this.loadSettings();
+        this.applySettings();
+        this.extractHeadings();
+        this.buildToc();
+        this.setupPageSections();
+        this.setupScrollspy();
+        this.setupMobileToggle();
+        this.setupSidebarKeyboardNavigation();
+        this.setupSectionJump();
+        this.setupSettingsPanel();
+        this.setupKeybindsPanel();
+        this.setupHeadingTabNavigation();
+        this.setupCodeBlockCopyButtons();
+        this.setupFootnotes();
+        this.setupProofToggles();
+        this.setupToggleScrollPreservation();
+        this.fixQedPlacement();
+        this.fixInlineMathBaseline();
+        this.fixTallInlineMath();
+        this.fixSectionLinks();
+        this.setupNavHistory();
+        this.setupGlobalSearch();
+        
+        // Show TOC list after it's built
+        if (this.tocList) {
+          requestAnimationFrame(() => {
+            this.tocList.classList.add('ready');
+          });
+        }
+      }
+
+      cleanPlaceholders() {
+        document.querySelectorAll('.toc-header [class^="toc-"]').forEach(el => {
+          if (el.textContent.match(/^\{\{.*\}\}$/)) el.textContent = '';
+        });
+      }
+
+      loadSettings() {
+        const saved = localStorage.getItem('typst-reader-settings');
+        if (saved) {
+          try {
+            this.settings = { ...this.settings, ...JSON.parse(saved) };
+          } catch (e) {
+            console.warn('Failed to load settings:', e);
+          }
+        }
+      }
+
+      saveSettings() {
+        localStorage.setItem('typst-reader-settings', JSON.stringify(this.settings));
+      }
+
+      applySettings() {
+        // Apply theme
+        if (this.settings.theme === 'auto') {
+          document.documentElement.removeAttribute('data-theme');
+        } else {
+          document.documentElement.setAttribute('data-theme', this.settings.theme);
+        }
+        
+        // Apply font
+        const fontPreset = this.presets.font[this.settings.font];
+        if (fontPreset) {
+          document.documentElement.style.setProperty('--content-font', fontPreset.family);
+          document.documentElement.style.setProperty('--content-font-size', fontPreset.size);
+        }
+        
+        // Apply spacing
+        const spacingValue = this.presets.spacing[this.settings.spacing];
+        if (spacingValue) {
+          document.documentElement.style.setProperty('--content-line-height', spacingValue);
+        }
+        
+        // Apply width
+        const widthValue = this.presets.width[this.settings.width];
+        if (widthValue) {
+          document.documentElement.style.setProperty('--content-max-width', widthValue);
+        }
+        
+        // Update active buttons
+        this.updateActiveButtons();
+      }
+
+      updateActiveButtons() {
+        if (!this.settingsPanel) return;
+        
+        Object.keys(this.settings).forEach(setting => {
+          const container = this.settingsPanel.querySelector(`[data-setting="${setting}"]`);
+          if (container) {
+            container.querySelectorAll('.settings-btn').forEach(btn => {
+              btn.classList.toggle('active', btn.dataset.value === this.settings[setting]);
+            });
+          }
+        });
+      }
+
+      setupSettingsPanel() {
+        if (!this.settingsToggle || !this.settingsPanel) return;
+        
+        // Toggle panel
+        this.settingsToggle.addEventListener('click', () => {
+          this.settingsPanel.classList.toggle('open');
+          this.settingsToggle.classList.toggle('active');
+        });
+        
+        // Handle setting changes
+        this.settingsPanel.querySelectorAll('.settings-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const settingType = btn.closest('[data-setting]').dataset.setting;
+            const value = btn.dataset.value;
+            
+            this.settings[settingType] = value;
+            this.saveSettings();
+            this.applySettings();
+          });
+        });
+        
+        // Initialize active states
+        this.updateActiveButtons();
+      }
+
+      setupKeybindsPanel() {
+        if (!this.keybindsPanel) return;
+
+        this.keybindsClose?.addEventListener('click', () => this.closeKeybindsPanel());
+        this.keybindsPanel.addEventListener('click', (e) => {
+          if (e.target === this.keybindsPanel) this.closeKeybindsPanel();
+        });
+
+        document.addEventListener('keydown', (e) => {
+          const key = typeof e.key === 'string' ? e.key.toLowerCase() : '';
+          const isSlash = key === '/' || e.code === 'Slash';
+
+          if (e.metaKey && !e.ctrlKey && !e.altKey && isSlash) {
+            e.preventDefault();
+            this.toggleKeybindsPanel();
+            return;
+          }
+
+          if (e.key === 'Escape' && this.keybindsPanel.classList.contains('open')) {
+            e.preventDefault();
+            this.closeKeybindsPanel();
+          }
+        });
+      }
+
+      openKeybindsPanel() {
+        if (!this.keybindsPanel) return;
+        this.keybindsPanel.classList.add('open');
+        this.keybindsPanel.setAttribute('aria-hidden', 'false');
+        requestAnimationFrame(() => this.keybindsClose?.focus());
+      }
+
+      closeKeybindsPanel() {
+        if (!this.keybindsPanel) return;
+        this.keybindsPanel.classList.remove('open');
+        this.keybindsPanel.setAttribute('aria-hidden', 'true');
+      }
+
+      toggleKeybindsPanel() {
+        if (this.keybindsPanel?.classList.contains('open')) {
+          this.closeKeybindsPanel();
+        } else {
+          this.openKeybindsPanel();
+        }
+      }
+
+      setupHeadingTabNavigation() {
+        document.addEventListener('keydown', (e) => {
+          if (e.key !== 'Tab' || !e.altKey || e.ctrlKey || e.metaKey) return;
+
+          if (this.isEditableElement(document.activeElement)) return;
+          if (this.keybindsPanel?.classList.contains('open')) return;
+          if (this.searchPanel?.classList.contains('open')) return;
+          if (this.sectionJump?.classList.contains('open')) return;
+          if (!this.moveSelectionToBigHeading(e.shiftKey ? -1 : 1)) return;
+
+          e.preventDefault();
+        }, true);
+      }
+
+      isEditableElement(element) {
+        return Boolean(element && (
+          element.tagName === 'TEXTAREA' ||
+          element.tagName === 'INPUT' ||
+          element.tagName === 'SELECT' ||
+          element.isContentEditable
+        ));
+      }
+
+      moveSelectionToBigHeading(direction) {
+        const headings = this.getBigHeadings();
+        if (headings.length === 0) return false;
+
+        const selection = window.getSelection();
+        const focusNode = selection?.focusNode || selection?.anchorNode || null;
+        const currentIndex = this.getCurrentBigHeadingIndex(headings, focusNode);
+        const targetIndex = this.getTargetBigHeadingIndex(headings, currentIndex, focusNode, direction);
+        const target = headings[targetIndex];
+        if (!target) return false;
+
+        const parentSection = target.closest('.page-section');
+        if (this.pageSections && parentSection) {
+          this.activatePageSection(parentSection);
+        }
+
+        this.placeSelectionAtElementEnd(target);
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return true;
+      }
+
+      getBigHeadings() {
+        if (this.pageSectionLevel) {
+          return Array.from(this.content.querySelectorAll('h' + this.pageSectionLevel));
+        }
+        if (this.headings.length > 0) {
+          const minLevel = Math.min(...this.headings.map(h => h.level));
+          return this.headings
+            .filter(h => h.level === minLevel)
+            .map(h => h.element)
+            .filter(Boolean);
+        }
+        return Array.from(this.content.querySelectorAll('h1, h2'));
+      }
+
+      getCurrentBigHeadingIndex(headings, focusNode) {
+        if (!focusNode) {
+          const activeSection = this.pageSectionEls?.find(sec => sec.classList.contains('active'));
+          const activeHeading = activeSection ? headings.find(h => activeSection.contains(h)) : null;
+          return Math.max(0, headings.indexOf(activeHeading));
+        }
+
+        const focusElement = focusNode.nodeType === Node.ELEMENT_NODE ? focusNode : focusNode.parentElement;
+        const containingIndex = headings.findIndex(heading => heading.contains(focusElement));
+        if (containingIndex >= 0) return containingIndex;
+
+        for (let i = headings.length - 1; i >= 0; i--) {
+          const order = headings[i].compareDocumentPosition(focusNode);
+          if (order & Node.DOCUMENT_POSITION_FOLLOWING) return i;
+        }
+        return 0;
+      }
+
+      getTargetBigHeadingIndex(headings, currentIndex, focusNode, direction) {
+        const current = headings[currentIndex];
+        if (!focusNode) return currentIndex;
+        if (direction < 0) {
+          if (current && focusNode && !current.contains(focusNode)) return currentIndex;
+          return Math.max(0, currentIndex - 1);
+        }
+        if (current && focusNode && current.contains(focusNode) && !this.isSelectionAtElementEnd(current)) {
+          return currentIndex;
+        }
+        return Math.min(headings.length - 1, currentIndex + 1);
+      }
+
+      isSelectionAtElementEnd(element) {
+        const selection = window.getSelection();
+        if (!selection || selection.rangeCount === 0) return false;
+
+        const current = selection.getRangeAt(0).cloneRange();
+        const end = document.createRange();
+        end.selectNodeContents(element);
+        end.collapse(false);
+        return current.compareBoundaryPoints(Range.START_TO_START, end) === 0;
+      }
+
+      placeSelectionAtElementEnd(element) {
+        const selection = window.getSelection();
+        if (!selection) return;
+
+        const range = document.createRange();
+        range.selectNodeContents(element);
+        range.collapse(false);
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
+
+      extractHeadings() {
+        // Find all headings (with or without IDs)
+        const headingElements = this.content.querySelectorAll('h1, h2, h3, h4');
+        
+        // Track heading counters for auto-numbering [level1, level2, level3, level4]
+        const counters = [0, 0, 0, 0];
+
+        // Track used slugs for deduplication
+        const usedSlugs = new Set();
+        
+        headingElements.forEach((el, index) => {
+          // Use data-level attribute if present (from Typst), otherwise fall back to tag level
+          const dataLevel = el.getAttribute('data-level');
+          const level = dataLevel ? parseInt(dataLevel) : parseInt(el.tagName[1]);
+          const text = el.textContent.trim();
+          
+          // Extract number if present - check for heading-number span first
+          let number = '';
+          let cleanText = text;
+          let cleanHtml = el.innerHTML; // Preserve HTML for colored tags like [TODO], [REVIEW]
+          const headingNumberSpan = el.querySelector('.heading-number');
+          if (headingNumberSpan) {
+            number = headingNumberSpan.textContent.replace(/\.$/, ''); // Remove trailing dot
+            cleanText = el.textContent.replace(headingNumberSpan.textContent, '').trim();
+            // Remove the heading-number span from HTML
+            cleanHtml = el.innerHTML.replace(headingNumberSpan.outerHTML, '').trim();
+          } else {
+            // Fall back to text matching (e.g., "1. Introduction" -> "1.")
+            let numberMatch = text.match(/^([\d.]+)\s*/);
+            number = numberMatch ? numberMatch[1] : '';
+            cleanText = numberMatch ? text.replace(numberMatch[0], '') : text;
+            // Remove number prefix from HTML too
+            if (numberMatch) {
+              cleanHtml = el.innerHTML.replace(/^[\d.]+\.\s*/, '');
+            }
+          }
+
+          // Generate ID if not present, using the clean (number-stripped) text for a readable slug
+          let id = el.id;
+          if (!id) {
+            let slug = cleanText.toLowerCase()
+              .replace(/[^a-z0-9]+/g, '-')
+              .replace(/^-|-$/g, '');
+            if (!slug) slug = 'section-' + index;
+            // Deduplicate: append a suffix only if the slug is already taken
+            let candidate = slug;
+            let suffix = 2;
+            while (usedSlugs.has(candidate)) {
+              candidate = slug + '-' + suffix;
+              suffix++;
+            }
+            id = candidate;
+            el.id = id;
+          }
+          usedSlugs.add(id);
+          
+          // Auto-generate numbers for numbered-heading class if no number found
+          if (!number && el.classList.contains('numbered-heading') && !headingNumberSpan) {
+            // Increment counter at current level (1-indexed, array is 0-indexed)
+            const levelIdx = level - 1;
+            counters[levelIdx]++;
+            // Reset deeper level counters
+            for (let i = levelIdx + 1; i < counters.length; i++) {
+              counters[i] = 0;
+            }
+            // Build number string (e.g., "1.2.3")
+            number = counters.slice(0, level).filter(n => n > 0).join('.');
+            // Prepend number to heading text in the DOM
+            if (number) {
+              el.innerHTML = `<span class="heading-number">${number}.</span> ${el.innerHTML}`;
+              // cleanHtml stays as original (without the new number)
+            }
+          }
+          
+          this.headings.push({
+            level,
+            text: cleanText,
+            html: cleanHtml, // Store HTML to preserve colored tags
+            number,
+            id,
+            element: el
+          });
+        });
+      }
+
+      buildToc() {
+        if (this.headings.length === 0) {
+          this.tocList.innerHTML = '<li style="padding: 12px 24px; color: var(--text-toc-muted); font-size: 0.875rem;">No headings found</li>';
+          return;
+        }
+
+        // Keep the template-provided title (note name) instead of overriding with first heading
+
+        this.tocList.innerHTML = this.headings
+          .filter(h => h.level <= 3) // Only show h1, h2, h3
+          .map(h => `
+            <li class="toc-item">
+              <a href="#${h.id}" class="toc-link" data-level="${h.level}" data-id="${h.id}">
+                ${h.number ? `<span class="toc-number">${h.number}</span>` : ''}
+                <span class="toc-text">${h.html || h.text}</span>
+              </a>
+            </li>
+          `).join('');
+
+        // Click handlers
+        this.tocList.querySelectorAll('.toc-link').forEach(link => {
+          link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const id = link.dataset.id;
+            const target = document.getElementById(id);
+            if (target) {
+              target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              // Close mobile TOC
+              this.closeMobileToc();
+            }
+          });
+        });
+      }
+
+      setupScrollspy() {
+        if (this._scrollspyObserver) {
+          this._scrollspyObserver.disconnect();
+        }
+        this._scrollspyObserver = new IntersectionObserver(
+          (entries) => {
+            entries.forEach(entry => {
+              if (entry.isIntersecting) {
+                this.setActiveLink(entry.target.id);
+              }
+            });
+          },
+          {
+            rootMargin: '-10% 0px -80% 0px',
+            threshold: 0
+          }
+        );
+
+        this.headings.forEach(h => {
+          if (h.element) this._scrollspyObserver.observe(h.element);
+        });
+      }
+
+      setActiveLink(id) {
+        this.tocList.querySelectorAll('.toc-link').forEach(link => {
+          link.classList.toggle('active', link.dataset.id === id);
+        });
+        if (this.sidebarMarkerIsImplicit) {
+          this.showSidebarMarkerForActiveLink(true);
+        }
+      }
+
+      setupMobileToggle() {
+        this.mobileTocToggle?.addEventListener('click', () => {
+          this.toggleMobileToc();
+        });
+
+        document.addEventListener('keydown', (e) => {
+          const key = typeof e.key === 'string' ? e.key.toLowerCase() : '';
+
+          const active = document.activeElement;
+          const isEditable = active && (
+            active.tagName === 'INPUT' ||
+            active.tagName === 'TEXTAREA' ||
+            active.tagName === 'SELECT' ||
+            active.isContentEditable
+          );
+          const selectedText = window.getSelection()?.toString() || '';
+
+          if (e.ctrlKey && !e.metaKey && !e.altKey && key === 's') {
+            e.preventDefault();
+            this.toggleMobileToc();
+            return;
+          }
+
+          if (!e.ctrlKey || e.metaKey || e.altKey || key !== 'c') return;
+          if (!window.matchMedia('(max-width: 1164px)').matches) return;
+          if (isEditable || selectedText.trim()) return;
+
+          e.preventDefault();
+          this.toggleMobileToc();
+        });
+
+        this.tocOverlay.addEventListener('click', () => {
+          this.closeMobileToc();
+        });
+      }
+
+      toggleMobileToc() {
+        if (this.toc.classList.contains('open')) {
+          this.closeMobileToc();
+        } else {
+          this.openMobileToc();
+        }
+      }
+
+      openMobileToc() {
+        this.toc.classList.add('open');
+        this.tocOverlay.classList.add('open');
+        this.mobileTocToggle?.setAttribute('aria-expanded', 'true');
+        this.mobileTocToggle?.setAttribute('aria-label', 'Hide sidebar');
+        this.showSidebarMarkerForActiveLink();
+      }
+
+      closeMobileToc() {
+        this.toc.classList.remove('open');
+        this.tocOverlay.classList.remove('open');
+        this.mobileTocToggle?.setAttribute('aria-expanded', 'false');
+        this.mobileTocToggle?.setAttribute('aria-label', 'Show sidebar');
+        this.clearSidebarMarker();
+        this.closeSectionJump();
+        this.closeGlobalSearch();
+      }
+
+      setupSidebarKeyboardNavigation() {
+        this.toc?.addEventListener('focusin', () => {
+          this.showSidebarMarkerForActiveLink();
+        });
+
+        this.toc?.addEventListener('focusout', (e) => {
+          if (this.sidebarMarkerIsImplicit && !this.toc.contains(e.relatedTarget)) {
+            this.clearSidebarMarker();
+          }
+        });
+
+        document.addEventListener('keydown', (e) => {
+          if (e.ctrlKey || e.metaKey || e.altKey) return;
+          if (!['ArrowDown', 'ArrowUp', 'Enter', 'Escape'].includes(e.key)) return;
+          if (this.searchPanel?.classList.contains('open') || this.keybindsPanel?.classList.contains('open')) return;
+          if (this.sectionJump?.classList.contains('open')) return;
+
+          const active = document.activeElement;
+          const isEditable = active && (
+            active.tagName === 'INPUT' ||
+            active.tagName === 'TEXTAREA' ||
+            active.tagName === 'SELECT' ||
+            active.isContentEditable
+          );
+          if (isEditable || !this.isSidebarContextActive()) return;
+
+          if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            this.moveSidebarMarker(1);
+          } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            this.moveSidebarMarker(-1);
+          } else if (e.key === 'Enter' && this.sidebarMarkerIndex >= 0) {
+            e.preventDefault();
+            this.activateSidebarMarker();
+          } else if (e.key === 'Escape' && this.sidebarMarkerIndex >= 0) {
+            e.preventDefault();
+            this.clearSidebarMarker();
+          }
+        });
+      }
+
+      getSidebarTocLinks() {
+        return Array.from(this.tocList?.querySelectorAll('.toc-link') || []);
+      }
+
+      getActiveSidebarLinkIndex(links) {
+        return links.findIndex(link => link.classList.contains('active'));
+      }
+
+      showSidebarMarkerForActiveLink(force = false) {
+        if (!force && this.sidebarMarkerIndex >= 0) return;
+        const links = this.getSidebarTocLinks();
+        if (links.length === 0) return;
+
+        const activeIndex = this.getActiveSidebarLinkIndex(links);
+        if (activeIndex < 0) return;
+        this.setSidebarMarker(activeIndex, links, true);
+      }
+
+      moveSidebarMarker(delta) {
+        const links = this.getSidebarTocLinks();
+        if (links.length === 0) return;
+
+        const markerStillValid = this.sidebarMarkerIndex >= 0 && this.sidebarMarkerIndex < links.length;
+        const baseIndex = markerStillValid
+          ? this.sidebarMarkerIndex
+          : this.getActiveSidebarLinkIndex(links);
+        const fallbackIndex = delta > 0 ? -1 : links.length;
+        const nextIndex = (baseIndex >= 0 ? baseIndex : fallbackIndex) + delta;
+        this.setSidebarMarker((nextIndex + links.length) % links.length, links);
+      }
+
+      setSidebarMarker(index, links = this.getSidebarTocLinks(), implicit = false) {
+        this.clearSidebarMarker();
+        const link = links[index];
+        if (!link) return;
+        this.sidebarMarkerIndex = index;
+        this.sidebarMarkerIsImplicit = implicit;
+        link.classList.add('sidebar-keyboard-marker');
+        link.scrollIntoView({ block: 'nearest' });
+      }
+
+      clearSidebarMarker() {
+        this.sidebarMarkerIndex = -1;
+        this.sidebarMarkerIsImplicit = false;
+        this.tocList?.querySelectorAll('.sidebar-keyboard-marker').forEach(link => {
+          link.classList.remove('sidebar-keyboard-marker');
+        });
+      }
+
+      activateSidebarMarker() {
+        const link = this.getSidebarTocLinks()[this.sidebarMarkerIndex];
+        if (!link) return;
+        link.click();
+      }
+
+      setupSectionJump() {
+        if (!this.sectionJump || !this.sectionJumpInput || !this.sectionJumpStatus) return;
+
+        document.addEventListener('keydown', (e) => {
+          const key = typeof e.key === 'string' ? e.key.toLowerCase() : '';
+          if (key !== '/' || e.ctrlKey || e.metaKey || e.altKey) return;
+          if (this.searchPanel?.classList.contains('open') || this.keybindsPanel?.classList.contains('open')) return;
+
+          const active = document.activeElement;
+          const isEditable = active && (
+            active.tagName === 'INPUT' ||
+            active.tagName === 'TEXTAREA' ||
+            active.tagName === 'SELECT' ||
+            active.isContentEditable
+          );
+          if (isEditable || !this.isSidebarContextActive()) return;
+
+          e.preventDefault();
+          this.openSectionJump();
+        });
+
+        this.sectionJumpInput.addEventListener('input', () => {
+          this.updateSectionJumpMatches();
+        });
+
+        this.sectionJumpInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            this.navigateToSectionJumpMatch();
+          } else if (e.key === 'Escape') {
+            e.preventDefault();
+            this.closeSectionJump();
+          } else if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            this.moveSectionJumpMatch(1);
+          } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            this.moveSectionJumpMatch(-1);
+          }
+        });
+      }
+
+      isSidebarContextActive() {
+        const active = document.activeElement;
+        return Boolean(
+          (active && this.toc?.contains(active)) ||
+          this.toc?.matches(':hover') ||
+          this.toc?.classList.contains('open')
+        );
+      }
+
+      openSectionJump() {
+        this.sectionJump.classList.add('open');
+        requestAnimationFrame(() => {
+          this.sectionJumpInput.focus();
+          this.sectionJumpInput.select();
+          this.updateSectionJumpMatches();
+        });
+      }
+
+      closeSectionJump() {
+        if (!this.sectionJump || !this.sectionJumpInput || !this.sectionJumpStatus) return;
+        this.sectionJump.classList.remove('open');
+        this.sectionJumpInput.value = '';
+        this.sectionJumpStatus.textContent = '';
+        this.clearSectionJumpHighlights();
+      }
+
+      normalizeSectionQuery(value) {
+        return String(value || '').toLowerCase().replace(/\s+/g, ' ').trim();
+      }
+
+      updateSectionJumpMatches() {
+        const query = this.normalizeSectionQuery(this.sectionJumpInput.value);
+        this.clearSectionJumpHighlights();
+        this.sectionJumpMatches = [];
+        this.activeSectionJumpIndex = -1;
+
+        if (!query) {
+          this.sectionJumpStatus.textContent = 'Type a section name or number';
+          return;
+        }
+
+        const candidates = this.headings
+          .filter(h => h.level <= 3)
+          .map((heading, order) => {
+            const number = this.normalizeSectionQuery(heading.number);
+            const text = this.normalizeSectionQuery(heading.text);
+            const label = this.normalizeSectionQuery(`${heading.number || ''} ${heading.text || ''}`);
+            let score = Infinity;
+            if (number === query || text === query || label === query) score = 0;
+            else if (number.startsWith(query)) score = 1;
+            else if (text.startsWith(query)) score = 2;
+            else if (label.startsWith(query)) score = 3;
+            else if (number.includes(query)) score = 4;
+            else if (text.includes(query) || label.includes(query)) score = 5;
+            return { heading, order, score };
+          })
+          .filter(item => item.score !== Infinity)
+          .sort((a, b) => a.score - b.score || a.order - b.order);
+
+        this.sectionJumpMatches = candidates.map(item => item.heading);
+        if (this.sectionJumpMatches.length === 0) {
+          this.sectionJumpStatus.textContent = 'No matching section';
+          return;
+        }
+
+        this.activeSectionJumpIndex = 0;
+        this.highlightSectionJumpMatch();
+      }
+
+      moveSectionJumpMatch(delta) {
+        if (this.sectionJumpMatches.length === 0) return;
+        this.activeSectionJumpIndex =
+          (this.activeSectionJumpIndex + delta + this.sectionJumpMatches.length) % this.sectionJumpMatches.length;
+        this.highlightSectionJumpMatch();
+      }
+
+      highlightSectionJumpMatch() {
+        this.clearSectionJumpHighlights();
+        const heading = this.sectionJumpMatches[this.activeSectionJumpIndex];
+        const link = heading ? this.getTocLinkForHeading(heading) : null;
+        if (!link) return;
+
+        link.classList.add('section-jump-match');
+        link.scrollIntoView({ block: 'nearest' });
+        this.sectionJumpStatus.textContent = `${this.activeSectionJumpIndex + 1}/${this.sectionJumpMatches.length}`;
+      }
+
+      clearSectionJumpHighlights() {
+        this.tocList?.querySelectorAll('.section-jump-match').forEach(link => {
+          link.classList.remove('section-jump-match');
+        });
+      }
+
+      getTocLinkForHeading(heading) {
+        return Array.from(this.tocList?.querySelectorAll('.toc-link') || [])
+          .find(link => link.dataset.id === heading.id);
+      }
+
+      navigateToSectionJumpMatch() {
+        const heading = this.sectionJumpMatches[this.activeSectionJumpIndex];
+        const link = heading ? this.getTocLinkForHeading(heading) : null;
+        if (!link) return;
+
+        link.click();
+        this.closeSectionJump();
+      }
+
+      setupCodeBlockCopyButtons() {
+        if (!this.content) return;
+
+        this.content.querySelectorAll('pre').forEach((pre) => {
+          const code = pre.querySelector('code');
+          if (!code || pre.querySelector(':scope > .code-copy-btn')) return;
+
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'code-copy-btn';
+          button.textContent = 'Copy';
+          button.setAttribute('aria-label', 'Copy code');
+
+          button.addEventListener('click', async () => {
+            const text = code.innerText;
+            const copied = await this.copyText(text);
+            button.textContent = copied ? 'Copied' : 'Failed';
+            button.blur();
+            window.setTimeout(() => {
+              button.textContent = 'Copy';
+            }, 1200);
+          });
+
+          pre.appendChild(button);
+        });
+      }
+
+      async copyText(text) {
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+            return true;
+          }
+        } catch (err) {}
+
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.setAttribute('readonly', '');
+        textarea.style.position = 'fixed';
+        textarea.style.left = '-9999px';
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+          return document.execCommand('copy');
+        } catch (err) {
+          return false;
+        } finally {
+          textarea.remove();
+        }
+      }
+
+      setupGlobalSearch() {
+        if (!this.searchPanel || !this.searchInput || !this.searchResultsEl) return;
+
+        this.searchInput.addEventListener('input', () => {
+          this.runGlobalSearch(this.searchInput.value);
+        });
+
+        this.searchInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            this.openSearchResult(this.activeSearchIndex >= 0 ? this.activeSearchIndex : 0);
+          } else if (e.key === 'Escape') {
+            e.preventDefault();
+            this.closeGlobalSearch();
+          } else if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            this.moveSearchSelection(1);
+          } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            this.moveSearchSelection(-1);
+          }
+        });
+
+        this.searchClose?.addEventListener('click', () => this.closeGlobalSearch());
+
+        document.addEventListener('keydown', (e) => {
+          const key = typeof e.key === 'string' ? e.key.toLowerCase() : '';
+          if (e.ctrlKey && !e.metaKey && !e.altKey && key === 'x') {
+            e.preventDefault();
+            if (this.searchPanel.classList.contains('open')) {
+              this.closeGlobalSearch();
+            } else {
+              this.openGlobalSearch();
+            }
+          } else if (e.key === 'Escape' && this.searchPanel.classList.contains('open')) {
+            e.preventDefault();
+            this.closeGlobalSearch();
+          }
+        });
+      }
+
+      openGlobalSearch() {
+        this.searchPanel.classList.add('open');
+        requestAnimationFrame(() => {
+          this.searchInput.focus();
+          this.searchInput.select();
+          this.runGlobalSearch(this.searchInput.value);
+        });
+      }
+
+      closeGlobalSearch() {
+        if (!this.searchPanel) return;
+        this.searchPanel.classList.remove('open');
+        this.searchMatches = [];
+        this.activeSearchIndex = -1;
+        if (this.searchInput) this.searchInput.value = '';
+        if (this.searchResultsEl) this.searchResultsEl.innerHTML = '';
+        if (this.searchCount) this.searchCount.textContent = '';
+      }
+
+      escapeHtml(value) {
+        return String(value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      getSearchTitle(element) {
+        const section = element.closest('.page-section');
+        const scopedHeading = section?.querySelector('h1, h2, h3, h4');
+        const previousHeading = this.headings
+          .filter(h => h.element.compareDocumentPosition(element) & Node.DOCUMENT_POSITION_FOLLOWING)
+          .at(-1);
+        return scopedHeading?.textContent?.trim() || previousHeading?.text || this.tocTitle?.textContent?.trim() || 'Result';
+      }
+
+      getSearchTarget(node) {
+        const parent = node.parentElement;
+        if (!parent) return null;
+        return parent.closest('p, li, .thm-box, details, figure, table, h1, h2, h3, h4') || parent;
+      }
+
+      buildSearchSnippet(text, query, index) {
+        const radius = 42;
+        const start = Math.max(0, index - radius);
+        const end = Math.min(text.length, index + query.length + radius);
+        const prefix = start > 0 ? '...' : '';
+        const suffix = end < text.length ? '...' : '';
+        const before = text.slice(start, index);
+        const match = text.slice(index, index + query.length);
+        const after = text.slice(index + query.length, end);
+        return prefix
+          + this.escapeHtml(before)
+          + '<mark>' + this.escapeHtml(match) + '</mark>'
+          + this.escapeHtml(after)
+          + suffix;
+      }
+
+      runGlobalSearch(rawQuery) {
+        const query = rawQuery.trim().toLowerCase();
+        this.searchMatches = [];
+        this.activeSearchIndex = -1;
+
+        if (!query) {
+          this.searchResultsEl.innerHTML = '';
+          if (this.searchCount) this.searchCount.textContent = '';
+          return;
+        }
+
+        const walker = document.createTreeWalker(
+          this.content,
+          NodeFilter.SHOW_TEXT,
+          {
+            acceptNode: (node) => {
+              const parent = node.parentElement;
+              if (!parent) return NodeFilter.FILTER_REJECT;
+              if (parent.closest('script, style, nav, [role="doc-endnotes"], .footnote-tooltip, .footnotes-section')) {
+                return NodeFilter.FILTER_REJECT;
+              }
+              return node.nodeValue.toLowerCase().includes(query)
+                ? NodeFilter.FILTER_ACCEPT
+                : NodeFilter.FILTER_REJECT;
+            }
+          }
+        );
+
+        while (this.searchMatches.length < 80) {
+          const node = walker.nextNode();
+          if (!node) break;
+          const text = node.nodeValue.replace(/\s+/g, ' ');
+          const index = text.toLowerCase().indexOf(query);
+          const target = this.getSearchTarget(node);
+          if (index < 0 || !target) continue;
+          this.searchMatches.push({
+            target,
+            section: target.closest('.page-section'),
+            title: this.getSearchTitle(target),
+            snippet: this.buildSearchSnippet(text, rawQuery.trim(), index),
+          });
+        }
+
+        this.renderSearchResults();
+      }
+
+      renderSearchResults() {
+        if (this.searchCount) {
+          this.searchCount.textContent = this.searchMatches.length
+            ? String(this.searchMatches.length)
+            : '0';
+        }
+
+        if (this.searchMatches.length === 0) {
+          this.searchResultsEl.innerHTML = '<li class="search-empty">No matches</li>';
+          return;
+        }
+
+        this.activeSearchIndex = 0;
+        this.searchResultsEl.innerHTML = this.searchMatches.map((match, idx) => `
+          <li class="search-result ${idx === 0 ? 'active' : ''}">
+            <button type="button" data-search-index="${idx}">
+              <span class="search-result-title">${this.escapeHtml(match.title)}</span>
+              <span class="search-result-snippet">${match.snippet}</span>
+            </button>
+          </li>
+        `).join('');
+
+        this.searchResultsEl.querySelectorAll('[data-search-index]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            this.openSearchResult(Number(btn.dataset.searchIndex));
+          });
+        });
+      }
+
+      moveSearchSelection(delta) {
+        if (this.searchMatches.length === 0) return;
+        this.activeSearchIndex = (this.activeSearchIndex + delta + this.searchMatches.length) % this.searchMatches.length;
+        this.searchResultsEl.querySelectorAll('.search-result').forEach((item, idx) => {
+          item.classList.toggle('active', idx === this.activeSearchIndex);
+          if (idx === this.activeSearchIndex) item.scrollIntoView({ block: 'nearest' });
+        });
+      }
+
+      openSearchResult(index) {
+        const match = this.searchMatches[index];
+        if (!match) return;
+        this._pushNav();
+        if (this.pageSections && match.section) {
+          this.activatePageSection(match.section);
+        }
+        this.closeGlobalSearch();
+        requestAnimationFrame(() => {
+          match.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          match.target.classList.add('section-highlight');
+          setTimeout(() => match.target.classList.remove('section-highlight'), 1500);
+        });
+      }
+
+      setupFootnotes() {
+        // Clean up previous footnotes created by a prior reinit to prevent duplicates.
+        this.content.querySelectorAll('.footnote-tooltip').forEach(el => el.remove());
+        this.content.querySelectorAll('details.footnotes-section').forEach(el => el.remove());
+
+        // Find all footnote markers in the main content.
+        // Note: Typst's HTML export also emits a `section[role="doc-endnotes"]` with the canonical footnote bodies.
+        // We prefer that source because it correctly preserves block-level content (including block equations).
+        const markers = Array.from(this.content.querySelectorAll('.footnote-marker'))
+          .filter(m => !m.closest('section[role="doc-endnotes"], [role="doc-endnotes"], aside.footnotes'));
+        
+        if (markers.length === 0) return;
+
+        // Map marker location id (e.g. "loc-1") -> endnote <li>
+        const endnoteByLocId = new Map();
+        const endnotesContainer = this.content.querySelector('section[role="doc-endnotes"], [role="doc-endnotes"], aside.footnotes');
+        if (endnotesContainer) {
+          endnotesContainer.querySelectorAll('li').forEach(li => {
+            const backlink = li.querySelector('a[role="doc-backlink"]');
+            const href = backlink?.getAttribute('href') || '';
+            if (href.startsWith('#') && href.length > 1) {
+              endnoteByLocId.set(href.slice(1), li);
+            }
+          });
+        }
+
+        const extractFootnoteHtml = (marker, fnNum) => {
+          // Preferred: Typst canonical endnotes section (handles block equations safely).
+          if (marker?.id && endnoteByLocId.has(marker.id)) {
+            const li = endnoteByLocId.get(marker.id);
+            const clone = li.cloneNode(true);
+            // Remove "backlink" (the little superscript link back to the marker).
+            clone.querySelectorAll('a[role="doc-backlink"]').forEach(a => a.remove());
+            return clone.innerHTML;
+          }
+
+          // Fallback: preamble-generated hidden footnote content (older exports).
+          const contentEl = this.content.querySelector('#fn-' + fnNum);
+          return contentEl ? contentEl.innerHTML : null;
+        };
+        
+        // Create tooltip for each marker
+        markers.forEach((marker) => {
+          const ref = marker.querySelector('.footnote-ref');
+          if (!ref) return;
+          
+          // Get footnote number from the text content
+          const fnNum = ref.textContent.trim();
+          const html = extractFootnoteHtml(marker, fnNum);
+          
+          if (!html) return;
+
+          // Create tooltip
+          const tooltip = document.createElement('div');
+          tooltip.className = 'footnote-tooltip';
+          tooltip.innerHTML = html;
+          marker.appendChild(tooltip);
+        });
+
+        if (this.pageSections && this.pageSectionEls) {
+          // In paged-sections mode: create a separate footnotes section per page-section.
+          // Only add the section if the page has footnotes.
+          this.pageSectionEls.forEach(sec => {
+            const secMarkers = Array.from(sec.querySelectorAll('.footnote-marker'))
+              .filter(m => !m.closest('section[role="doc-endnotes"], [role="doc-endnotes"], aside.footnotes'));
+            if (secMarkers.length === 0) return;
+
+            const details = document.createElement('details');
+            details.className = 'footnotes-section';
+            details.innerHTML = '<summary>Footnotes</summary><ol></ol>';
+            const ol = details.querySelector('ol');
+
+            secMarkers.forEach(marker => {
+              const ref = marker.querySelector('.footnote-ref');
+              if (!ref) return;
+              const fnNum = ref.textContent.trim();
+              const html = extractFootnoteHtml(marker, fnNum);
+              if (!html) return;
+
+              const li = document.createElement('li');
+              li.id = 'footnote-' + fnNum;
+              if (!isNaN(parseInt(fnNum))) li.value = parseInt(fnNum);
+              li.innerHTML = html;
+              ol.appendChild(li);
+            });
+
+            sec.appendChild(details);
+
+            // Click handler for markers in this section
+            secMarkers.forEach(marker => {
+              marker.style.cursor = 'pointer';
+              marker.addEventListener('click', () => {
+                details.setAttribute('open', '');
+                const ref = marker.querySelector('.footnote-ref');
+                if (!ref) return;
+                const fnNum = ref.textContent.trim();
+                const footnoteItem = document.getElementById('footnote-' + fnNum);
+                if (footnoteItem) {
+                  footnoteItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  footnoteItem.style.background = 'var(--accent-soft)';
+                  setTimeout(() => { footnoteItem.style.background = ''; }, 2000);
+                }
+              });
+            });
+          });
+        } else {
+          // Normal mode: single footnotes section at bottom
+          markers.forEach(marker => {
+            marker.style.cursor = 'pointer';
+            marker.addEventListener('click', () => {
+              const footnotesToggle = this.content.querySelector('details.footnotes-section');
+              if (footnotesToggle) footnotesToggle.setAttribute('open', '');
+              const ref = marker.querySelector('.footnote-ref');
+              if (!ref) return;
+              const fnNum = ref.textContent.trim();
+              const footnoteItem = document.getElementById('footnote-' + fnNum);
+              if (footnoteItem) {
+                footnoteItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                footnoteItem.style.background = 'var(--accent-soft)';
+                setTimeout(() => { footnoteItem.style.background = ''; }, 2000);
+              }
+            });
+          });
+
+          const section = document.createElement('details');
+          section.className = 'footnotes-section';
+          section.innerHTML = '<summary>Footnotes</summary><ol></ol>';
+          const ol = section.querySelector('ol');
+
+          let appendedAny = false;
+          markers.forEach(marker => {
+            const ref = marker.querySelector('.footnote-ref');
+            if (!ref) return;
+            const fnNum = ref.textContent.trim();
+            const html = extractFootnoteHtml(marker, fnNum);
+            if (!html) return;
+
+            const li = document.createElement('li');
+            li.id = 'footnote-' + fnNum;
+            if (!isNaN(parseInt(fnNum))) li.value = parseInt(fnNum);
+            li.innerHTML = html;
+            ol.appendChild(li);
+            appendedAny = true;
+          });
+
+          if (appendedAny) {
+            this.content.appendChild(section);
+          }
+        }
+      }
+
+      setupToggleScrollPreservation() {
+        // Prevent scroll jumps when opening <details> for the first time (content layout/images load).
+        if (this._toggleScrollPreservationInstalled) return;
+        this._toggleScrollPreservationInstalled = true;
+
+        const matchesToggleDetails = (details) => {
+          if (!details) return false;
+          return details.matches('details.proof-box, details.toggle-box, details.footnotes-section');
+        };
+
+        const adjustToKeepAnchorFixed = (anchorEl, beforeTop, beforeScrollY) => {
+          if (!anchorEl) return;
+          const afterTop = anchorEl.getBoundingClientRect().top;
+          const delta = afterTop - beforeTop;
+          if (Math.abs(delta) > 0.5) {
+            window.scrollTo(0, beforeScrollY + delta);
+          }
+        };
+
+        // Use event delegation so it survives incremental content swaps.
+        this.content.addEventListener('click', (e) => {
+          const summary = e.target?.closest?.('summary');
+          if (!summary) return;
+          const details = summary.parentElement;
+          if (!matchesToggleDetails(details)) return;
+
+          // Record anchor position BEFORE the toggle happens.
+          const beforeTop = summary.getBoundingClientRect().top;
+          const beforeScrollY = window.scrollY;
+
+          // After DOM updates + layout settle, adjust scroll to keep summary fixed.
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              adjustToKeepAnchorFixed(summary, beforeTop, beforeScrollY);
+
+              // If we're opening, images inside may load later and shift layout again.
+              // Keep the summary anchored as those images load.
+              if (details?.open) {
+                const imgs = Array.from(details.querySelectorAll('img'));
+                imgs.forEach((img) => {
+                  if (img.complete) return;
+                  if (img.dataset.scrollAnchorBound === '1') return;
+                  img.dataset.scrollAnchorBound = '1';
+                  const onDone = () => adjustToKeepAnchorFixed(summary, beforeTop, beforeScrollY);
+                  img.addEventListener('load', onDone, { once: true });
+                  img.addEventListener('error', onDone, { once: true });
+                });
+              }
+            });
+          });
+        }, true);
+      }
+
+      // ---------------------------------------------------------------------
+      // Toggle persistence (proof + toggle)
+      // ---------------------------------------------------------------------
+      getProofStorageKey() {
+        // Key by note path so different notes don't share toggle state.
+        // Example: "/inference/" -> "/inference"
+        const noteKey = (location.pathname || '/').replace(/\/$/, '') || '/';
+        return 'typst-proof-toggle-state:' + noteKey;
+      }
+
+      loadProofToggleState() {
+        try {
+          const raw = localStorage.getItem(this.getProofStorageKey());
+          if (!raw) return {};
+          const parsed = JSON.parse(raw);
+          return parsed && typeof parsed === 'object' ? parsed : {};
+        } catch (_) {
+          return {};
+        }
+      }
+
+      saveProofToggleState(state) {
+        try {
+          localStorage.setItem(this.getProofStorageKey(), JSON.stringify(state || {}));
+        } catch (_) {
+          // Ignore (storage may be unavailable)
+        }
+      }
+
+      saveProofToggleStateFromDom() {
+        const state = {};
+        const proofBoxes = Array.from(this.content.querySelectorAll('details.proof-box:not(.toggle-box)'));
+        const toggleBoxes = Array.from(this.content.querySelectorAll('details.toggle-box'));
+
+        proofBoxes.forEach((box, idx) => { state['proof:' + String(idx)] = !!box.open; });
+        toggleBoxes.forEach((box, idx) => { state['toggle:' + String(idx)] = !!box.open; });
+
+        if (proofBoxes.length === 0 && toggleBoxes.length === 0) return;
+        this.saveProofToggleState(state);
+      }
+
+      setupProofToggles() {
+        const state = this.loadProofToggleState();
+        const proofBoxes = Array.from(this.content.querySelectorAll('details.proof-box:not(.toggle-box)'));
+        const toggleBoxes = Array.from(this.content.querySelectorAll('details.toggle-box'));
+        if (proofBoxes.length === 0 && toggleBoxes.length === 0) return;
+
+        const apply = (boxes, kind) => {
+          boxes.forEach((box, idx) => {
+            const key = kind + ':' + String(idx);
+            box.dataset.proofIndex = key;
+            if (Object.prototype.hasOwnProperty.call(state, key)) {
+              if (state[key]) box.setAttribute('open', '');
+              else box.removeAttribute('open');
+            }
+          });
+
+          boxes.forEach((box) => {
+            box.addEventListener('toggle', () => {
+              const key = box.dataset.proofIndex;
+              if (key == null) return;
+              const next = this.loadProofToggleState();
+              next[String(key)] = !!box.open;
+              this.saveProofToggleState(next);
+            });
+          });
+        };
+
+        apply(proofBoxes, 'proof');
+        apply(toggleBoxes, 'toggle');
+      }
+
+      fixQedPlacement() {
+        // IMPORTANT: We must match ONLY the actual QED box glyph.
+        // Earlier heuristics (holes/compound paths/etc) will incorrectly match letters like A/B/P/ℝ/ℙ.
+
+        // Cleanup JS-added classes. Don't touch span.qed - Typst preamble sets it correctly.
+        this.content.querySelectorAll('p.qed-paragraph').forEach(p => p.classList.remove('qed-paragraph'));
+        this.content.querySelectorAll('p.has-qed').forEach(p => p.classList.remove('has-qed'));
+        this.content.querySelectorAll('.qed-text').forEach(el => {
+          // Unwrap: move children out, then remove wrapper.
+          const p = el.parentElement;
+          if (!p) return;
+          while (el.firstChild) p.insertBefore(el.firstChild, el);
+          el.remove();
+        });
+
+        // Handle text-based QED spans from Typst preamble (class="qed" with □ character)
+        // If standalone in paragraph, add qed-paragraph class for right alignment
+        this.content.querySelectorAll('span.qed').forEach(span => {
+          if (span.querySelector('svg')) return; // Skip SVG-based, handled below
+          const p = span.closest('p');
+          if (!p) return;
+          const meaningful = Array.from(p.childNodes).filter(n => 
+            n.nodeType !== Node.TEXT_NODE || n.textContent.trim().length > 0
+          );
+          if (meaningful.length === 1 && meaningful[0] === span) {
+            p.classList.add('qed-paragraph');
+          } else {
+            p.classList.add('has-qed');
+          }
+        });
+
+        // Legacy: SVG-based QED detection
+        // Typst HTML represents the QED box as a single-glyph SVG <use>.
+        // Glyph ids vary per build, so rely on shape signature first.
+        const QED_GLYPH_IDS = new Set(['g90369086EC55A1C591EB7CE746D548D4']); // legacy fallback
+
+        const isQedPathSignature = (d) => {
+          if (!d) return false;
+          // General signature of Typst's hollow square:
+          // - contains vertical segments around 7 units (inner square)
+          // - contains horizontal segments around 7 units
+          // - closes the path (Z)
+          return (
+            /v\s*-?7\.[0-9]+/i.test(d) &&
+            /h\s*-?7\.[0-9]+/i.test(d) &&
+            /v\s*7\.[0-9]+/i.test(d) &&
+            /Z/i.test(d)
+          );
+        };
+
+        const paragraphs = this.content.querySelectorAll('p');
+
+        paragraphs.forEach(p => {
+          const spans = p.querySelectorAll('span[style*="inline-block"]');
+          if (spans.length === 0) return;
+
+          spans.forEach(span => {
+            const svg = span.querySelector('svg.typst-frame');
+            if (!svg) return;
+
+            const useElements = svg.querySelectorAll('use');
+            if (useElements.length !== 1) return;
+
+            const useEl = useElements[0];
+            const href = useEl.getAttribute('xlink:href') || useEl.getAttribute('href');
+            if (!href || !href.startsWith('#')) return;
+
+            const glyphId = href.slice(1);
+            let isQed = QED_GLYPH_IDS.has(glyphId);
+
+            if (!isQed) {
+              // Symbol definitions live in a shared <defs> at document level.
+              const symbol = document.getElementById(glyphId) || svg.querySelector(`symbol#${glyphId}`);
+              const pathEl = symbol?.querySelector('path');
+              const d = pathEl?.getAttribute('d') || '';
+              isQed = isQedPathSignature(d);
+            }
+
+            if (!isQed) return;
+
+            // If this paragraph contains ONLY this QED (standalone QED paragraph), right-align the paragraph.
+            const meaningfulContent = Array.from(p.childNodes).filter(node => {
+              if (node.nodeType === Node.TEXT_NODE) return node.textContent.trim().length > 0;
+              return true;
+            });
+
+            if (meaningfulContent.length === 1 && meaningfulContent[0] === span) {
+              p.classList.add('qed-paragraph');
+              span.classList.add('qed');
+            } else {
+              span.classList.add('qed');
+              p.classList.add('has-qed');
+            }
+          });
+        });
+
+        // If the QED is emitted as its own paragraph, try to merge it into the
+        // previous paragraph so it appears on the same final line.
+        // (This commonly happens because `h(1fr)` is ignored in HTML export.)
+        Array.from(this.content.querySelectorAll('p.qed-paragraph')).forEach(p => {
+          const qedSpan = p.querySelector('span.qed');
+          if (!qedSpan) return;
+
+          const prev = p.previousElementSibling;
+          if (!prev || prev.tagName !== 'P') return;
+          if (prev.querySelector('span.qed')) return; // already has one
+
+          prev.appendChild(document.createTextNode(' '));
+          prev.appendChild(qedSpan);
+          prev.classList.add('has-qed');
+          p.remove();
+        });
+
+        // Wrap paragraph content so flex layout only has two children:
+        // `.qed-text` (all text/content) and `span.qed` (the box).
+        // Avoid `:scope` selectors for broader browser compatibility.
+        Array.from(this.content.querySelectorAll('p.has-qed')).forEach(p => {
+          const hasWrapper = Array.from(p.children).some(ch => ch.classList?.contains('qed-text'));
+          if (hasWrapper) return;
+
+          let qedEl = Array.from(p.children).find(
+            ch => ch.tagName === 'SPAN' && ch.classList.contains('qed'),
+          );
+          if (!qedEl) {
+            // Try to hoist nested QED to be a direct child.
+            const nested = p.querySelector('span.qed');
+            if (!nested) return;
+            qedEl = nested;
+            p.appendChild(qedEl);
+          }
+
+          const wrap = document.createElement('span');
+          wrap.className = 'qed-text';
+
+          // Move everything except the QED into the wrapper.
+          while (p.firstChild && p.firstChild !== qedEl) {
+            wrap.appendChild(p.firstChild);
+          }
+          p.insertBefore(wrap, qedEl);
+        });
+      }
+
+      fixInlineMathBaseline() {
+        // Typst's inline math SVGs always have height ≥ the standard text
+        // ascent (the frame height when there's no descent). Content above
+        // the standard ascent overflows via overflow:visible; content below
+        // the baseline extends the viewBox (and CSS height). So:
+        //   descent = height - standard_ascent
+        // The standard ascent is the minimum height across all inline SVGs.
+        const svgs = [];
+        this.content.querySelectorAll('svg.typst-frame').forEach(svg => {
+          if (svg.closest('.block-math')) return;
+          const p = svg.parentElement;
+          if (p?.matches?.('p') && p.children.length === 1 && p.childNodes.length === 1) return;
+          const h = parseFloat(svg.style.height);
+          if (h > 0) svgs.push({ el: svg, h });
+        });
+        if (svgs.length === 0) return;
+
+        const standardAscent = Math.min(...svgs.map(s => s.h));
+
+        for (const { el, h } of svgs) {
+          const descent = h - standardAscent;
+          if (descent < 0.001) continue;
+          el.style.verticalAlign = `${-descent}em`;
+        }
+      }
+
+      fixTallInlineMath() {
+        this.content.querySelectorAll('span[style*="inline-block"]').forEach(span => {
+          const svg = span.querySelector('svg.typst-frame');
+          if (!svg || span.closest('.block-math')) return;
+
+          try {
+            const bbox = svg.getBBox();
+            const vb = svg.viewBox.baseVal;
+            if (!vb || vb.height === 0) return;
+
+            const cssHeight = svg.getBoundingClientRect().height;
+            const scale = cssHeight / vb.height;
+
+            const overTop = Math.max(0, vb.y - bbox.y) * scale;
+            const overBot = Math.max(0, (bbox.y + bbox.height) - (vb.y + vb.height)) * scale;
+
+            if (overTop > 10) {
+              span.style.marginTop = `${overTop + 5}px`;
+            }
+            if (overBot > 10) {
+              span.style.marginBottom = `${overBot + 5}px`;
+            }
+          } catch(e) {}
+        });
+      }
+
+      fixSectionLinks() {
+        // Fix internal reference links (sections, equations, figures)
+        // Adds smooth scrolling and highlight effects
+        
+        const links = this.content.querySelectorAll('a[href^="#"]:not([data-link-fixed])');
+        
+        links.forEach(link => {
+          link.setAttribute('data-link-fixed', '');
+          const href = link.getAttribute('href');
+          const targetId = href.slice(1); // Remove # prefix
+          const linkText = link.textContent.trim();
+          
+          // Check what type of reference this is
+          const sectionMatch = linkText.match(/^Section\s+([\d.]+)$/);
+          const equationMatch = linkText.match(/^Equation\s+([\d.]+)$/);
+          const figureMatch = linkText.match(/^Figure\s+(\d+)$/);
+          const thmMatch = linkText.match(/^(Theorem|Lemma|Proposition|Corollary|Definition|Example|Idea)\s+([\d.]+)$/);
+          
+          if (thmMatch) {
+            link.addEventListener('click', (e) => {
+              e.preventDefault();
+              const target = document.getElementById(targetId);
+              if (target) {
+                this._pushNav();
+                if (this.pageSections) {
+                  const parentSection = target.closest('.page-section');
+                  if (parentSection) this.activatePageSection(parentSection);
+                }
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                target.style.background = 'var(--accent-soft)';
+                setTimeout(() => { target.style.background = ''; }, 2000);
+              }
+            });
+          } else if (sectionMatch) {
+            const sectionNum = sectionMatch[1];
+            
+            // Find the heading with this section number
+            link.addEventListener('click', (e) => {
+              e.preventDefault();
+              this._pushNav();
+              
+              // Look for heading that starts with this number
+              const headings = this.content.querySelectorAll('h1, h2, h3, h4');
+              for (const heading of headings) {
+                const text = heading.textContent.trim();
+                // Match "1.2. Title" or "1.2 Title" patterns
+                if (text.startsWith(sectionNum + '.') || text.startsWith(sectionNum + ' ')) {
+                  // In paged-sections mode, reveal the parent section first
+                  if (this.pageSections) {
+                    const parentSection = heading.closest('.page-section');
+                    if (parentSection) this.activatePageSection(parentSection);
+                  }
+                  heading.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  heading.style.background = 'var(--accent-soft)';
+                  setTimeout(() => { heading.style.background = ''; }, 2000);
+                  return;
+                }
+              }
+              
+              // Fallback: try to find by the original href
+              const target = document.getElementById(targetId);
+              if (target) {
+                if (this.pageSections) {
+                  const parentSection = target.closest('.page-section');
+                  if (parentSection) this.activatePageSection(parentSection);
+                }
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }
+            });
+          } else if (equationMatch || figureMatch) {
+            // Equation and figure links - smooth scroll to target with highlight
+            link.addEventListener('click', (e) => {
+              e.preventDefault();
+              const target = document.getElementById(targetId);
+              if (target) {
+                this._pushNav();
+                if (this.pageSections) {
+                  const parentSection = target.closest('.page-section');
+                  if (parentSection) this.activatePageSection(parentSection);
+                }
+                target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                target.style.background = 'var(--accent-soft)';
+                setTimeout(() => { target.style.background = ''; }, 2000);
+              }
+            });
+          }
+        });
+      }
+
+      _captureNavState() {
+        return {
+          scrollY: window.scrollY,
+          sectionIdx: (this.pageSections && this.pageSectionEls)
+            ? this.pageSectionEls.findIndex(s => s.classList.contains('active'))
+            : -1
+        };
+      }
+
+      _restoreNavState(state) {
+        if (this.pageSections && this.pageSectionEls && state.sectionIdx >= 0 && state.sectionIdx < this.pageSectionEls.length) {
+          this.activatePageSection(this.pageSectionEls[state.sectionIdx]);
+        }
+        window.scrollTo({ top: state.scrollY, behavior: 'smooth' });
+      }
+
+      _pushNav() {
+        this._navBackStack.push(this._captureNavState());
+        this._navForwardStack = [];
+      }
+
+      _navBack() {
+        if (this._navBackStack.length === 0) return;
+        this._navForwardStack.push(this._captureNavState());
+        this._restoreNavState(this._navBackStack.pop());
+      }
+
+      _navForward() {
+        if (this._navForwardStack.length === 0) return;
+        this._navBackStack.push(this._captureNavState());
+        this._restoreNavState(this._navForwardStack.pop());
+      }
+
+      setupNavHistory() {
+        document.addEventListener('keydown', (e) => {
+          if (this.searchPanel?.classList.contains('open')) {
+            if (e.ctrlKey && !e.metaKey && (e.key === '[' || e.key === ']')) e.preventDefault();
+            return;
+          }
+          if (e.ctrlKey && !e.metaKey && e.key === '[') {
+            e.preventDefault();
+            this._navBack();
+          } else if (e.ctrlKey && !e.metaKey && e.key === ']') {
+            e.preventDefault();
+            this._navForward();
+          }
+        });
+      }
+
+      setupPageSections() {
+        // If section wrappers already exist (incremental update), reuse them.
+        const existingSections = Array.from(this.content.querySelectorAll(':scope > .page-section'));
+        if (existingSections.length > 0) {
+          this.pageSections = true;
+          this.pageSectionEls = existingSections;
+          if (this.headings.length > 0) {
+            this.pageSectionLevel = Math.min(...this.headings.map(h => h.level));
+          }
+          // Re-attach TOC handlers (buildToc recreated the TOC links)
+          this._attachPageSectionTocHandlers();
+          return;
+        }
+
+        // Check for the marker element emitted by Typst when page-sections is enabled
+        const flag = this.content.querySelector('#page-sections-flag');
+        if (!flag) {
+          this.pageSections = false;
+          return;
+        }
+        this.pageSections = true;
+        flag.remove();
+
+        // Typst maps heading levels with an offset (= becomes <h2>, == becomes <h3>, etc.)
+        // Detect the actual minimum heading tag level in the content to use as section boundaries.
+        if (this.headings.length === 0) return;
+        const minLevel = Math.min(...this.headings.map(h => h.level));
+        this.pageSectionLevel = minLevel;
+        const sectionTagName = 'H' + minLevel;
+
+        // Group DOM children of the content element into <section class="page-section"> wrappers.
+        // Each top-level heading starts a new section. Content before the first one is a preamble.
+        const children = Array.from(this.content.childNodes);
+        let currentSection = document.createElement('section');
+        currentSection.className = 'page-section';
+        currentSection.dataset.sectionIdx = '0';
+        const sections = [currentSection];
+        let sectionIdx = 0;
+
+        children.forEach(node => {
+          const isSectionHeading = node.nodeType === Node.ELEMENT_NODE && node.tagName === sectionTagName;
+          if (isSectionHeading) {
+            sectionIdx++;
+            currentSection = document.createElement('section');
+            currentSection.className = 'page-section';
+            currentSection.dataset.sectionIdx = String(sectionIdx);
+            sections.push(currentSection);
+          }
+          currentSection.appendChild(node);
+        });
+
+        // Append all section wrappers back into the content element
+        sections.forEach(sec => this.content.appendChild(sec));
+        this.pageSectionEls = sections;
+
+        // Determine which section to show initially (from URL hash or default).
+        // Skip an empty preamble section (no heading, only whitespace).
+        let initialSection = sections[0];
+        const preambleHasContent = sections[0].querySelector(sectionTagName) ||
+          sections[0].textContent.trim().length > 0;
+        if (!preambleHasContent && sections.length > 1) {
+          initialSection = sections[1];
+        }
+
+        const hash = location.hash.slice(1);
+        if (hash) {
+          const hashTarget = document.getElementById(hash);
+          if (hashTarget) {
+            const parentSec = hashTarget.closest('.page-section');
+            if (parentSec) initialSection = parentSec;
+          }
+        }
+        this.activatePageSection(initialSection);
+
+        // Attach TOC click handlers and hashchange listener
+        this._attachPageSectionTocHandlers();
+
+        // Handle browser back/forward via hashchange (only once)
+        if (!this._hashChangeAttached) {
+          this._hashChangeAttached = true;
+          window.addEventListener('hashchange', () => {
+            const id = location.hash.slice(1);
+            if (!id) return;
+            const target = document.getElementById(id);
+            if (!target) return;
+            const parentSection = target.closest('.page-section');
+            if (parentSection) {
+              this.activatePageSection(parentSection);
+              target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          });
+        }
+      }
+
+      _attachPageSectionTocHandlers() {
+        const minLevel = this.pageSectionLevel || 2;
+        this.tocList.querySelectorAll('.toc-link').forEach(link => {
+          // Clone+replace to strip old click listeners from buildToc
+          const newLink = link.cloneNode(true);
+          link.parentNode.replaceChild(newLink, link);
+
+          newLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            const id = newLink.dataset.id;
+            const level = parseInt(newLink.dataset.level);
+            const target = document.getElementById(id);
+            if (!target) return;
+
+            const parentSection = target.closest('.page-section');
+            if (!parentSection) return;
+
+            if (level === minLevel) {
+              this.activatePageSection(parentSection);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+              this.activatePageSection(parentSection);
+              target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+            this.closeMobileToc();
+          });
+        });
+      }
+
+      activatePageSection(section) {
+        if (!this.pageSectionEls) return;
+        this.pageSectionEls.forEach(sec => sec.classList.remove('active'));
+        section.classList.add('active');
+
+        // Find the section's top-level heading for deep-linking and TOC highlighting
+        const tagName = this.pageSectionLevel ? 'h' + this.pageSectionLevel : 'h2';
+        const heading = section.querySelector(tagName);
+        if (heading && heading.id) {
+          history.replaceState(null, '', '#' + heading.id);
+          this.setActiveLink(heading.id);
+        }
+      }
+    }
+
+    // Initialize when DOM is ready
+    function initializeReader() {
+      window.typstReader = new TypstReader();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initializeReader);
+    } else {
+      // DOM is already loaded
+      initializeReader();
+    }
+
+    // Fallback: show TOC list after 500ms even if initialization fails
+    setTimeout(() => {
+      const tocList = document.getElementById('toc-list');
+      if (tocList && !tocList.classList.contains('ready')) {
+        tocList.classList.add('ready');
+      }
+    }, 500);
+
+    // Manual refresh support (Ctrl+R = incremental, Cmd+R = full reload)
+    (function() {
+      let isUpdating = false;
+      let cachedManifest = null;
+      let sectionWrappers = null;
+
+      // Pre-cache manifest on page load so the first Ctrl+R can diff
+      // instead of falling back to the slow full-rebuild path.
+      {
+        const notePath = location.pathname.replace(/\/$/, '');
+        fetch(notePath + '/content.manifest.json?t=' + Date.now())
+          .then(r => r.ok ? r.json() : null)
+          .then(m => {
+            if (!m) return;
+            cachedManifest = m;
+            // Ensure header metadata is corrected on initial page load too.
+            applyManifestMeta(m);
+          })
+          .catch(() => {});
+      }
+
+      function reinitReader() {
+        const contentEl = document.getElementById('typst-content');
+        if (!contentEl) return;
+        const headingElements = contentEl.querySelectorAll('h1.numbered-heading, h2.numbered-heading, h3.numbered-heading, h4.numbered-heading');
+        const counters = [0, 0, 0, 0];
+        headingElements.forEach((el) => {
+          if (el.querySelector('.heading-number')) return;
+          const dataLevel = el.getAttribute('data-level');
+          const level = dataLevel ? parseInt(dataLevel) : parseInt(el.tagName[1]);
+          const text = el.textContent.trim();
+          if (text.match(/^([\d.]+)\s*/)) return;
+          const levelIdx = level - 1;
+          counters[levelIdx]++;
+          for (let i = levelIdx + 1; i < counters.length; i++) counters[i] = 0;
+          const number = counters.slice(0, level).filter(n => n > 0).join('.');
+          if (number) el.innerHTML = '<span class="heading-number">' + number + '.</span> ' + el.innerHTML;
+        });
+        if (window.typstReader) {
+          window.typstReader.headings = [];
+          window.typstReader.extractHeadings();
+          window.typstReader.buildToc();
+          window.typstReader.setupPageSections();
+          window.typstReader.setupScrollspy();
+          if (window.typstReader.sectionJump?.classList.contains('open')) {
+            window.typstReader.updateSectionJumpMatches();
+          }
+          window.typstReader.setupCodeBlockCopyButtons();
+          window.typstReader.setupFootnotes();
+          window.typstReader.setupProofToggles();
+          window.typstReader.setupToggleScrollPreservation();
+          window.typstReader.fixQedPlacement();
+          window.typstReader.fixInlineMathBaseline();
+          window.typstReader.fixTallInlineMath();
+          window.typstReader.fixSectionLinks();
+        }
+      }
+
+      async function fetchSection(notePath, idx) {
+        const r = await fetch(notePath + '/sections/' + idx + '.html?t=' + Date.now());
+        if (!r.ok) throw new Error('Failed to fetch section ' + idx);
+        return r.text();
+      }
+
+      function flashContentIndicator(reader, activeIdx) {
+        let flashEl = null;
+        if (reader && reader.pageSections && reader.pageSectionEls) {
+          flashEl = reader.pageSectionEls[activeIdx >= 0 ? activeIdx : 0];
+        } else {
+          flashEl = document.getElementById('typst-content');
+        }
+        if (flashEl) {
+          flashEl.style.transition = 'opacity 0.15s ease';
+          flashEl.style.opacity = '0.7';
+          setTimeout(() => { flashEl.style.opacity = '1'; }, 150);
+        }
+      }
+
+      // Build section wrapper DOM elements from fetched HTML parts.
+      // In paged mode, creates <section class="page-section"> so setupPageSections detects them.
+      // In non-paged mode, creates plain <div> wrappers for surgical replacement.
+      function buildSectionWrappers(contentEl, parts) {
+        const willBePaged = parts[0] && parts[0].includes('id="page-sections-flag"');
+        contentEl.innerHTML = '';
+        sectionWrappers = parts.map((html, i) => {
+          const el = willBePaged
+            ? document.createElement('section')
+            : document.createElement('div');
+          if (willBePaged) {
+            el.className = 'page-section';
+          }
+          el.dataset.sectionIdx = String(i);
+          el.innerHTML = html;
+          contentEl.appendChild(el);
+          return el;
+        });
+      }
+
+      function getManifestMeta(manifest) {
+        if (!manifest || typeof manifest !== 'object') return null;
+        const meta = manifest.meta;
+        if (!meta || typeof meta !== 'object') return null;
+        return {
+          title: typeof meta.title === 'string' ? meta.title : '',
+          course: typeof meta.course === 'string' ? meta.course : '',
+          term: typeof meta.term === 'string' ? meta.term : '',
+          instructor: typeof meta.instructor === 'string' ? meta.instructor : '',
+        };
+      }
+
+      function metaChanged(prevManifest, nextManifest) {
+        const prev = getManifestMeta(prevManifest);
+        const next = getManifestMeta(nextManifest);
+        if (!prev && !next) return false;
+        if (!prev || !next) return true;
+        return (
+          prev.title !== next.title ||
+          prev.course !== next.course ||
+          prev.term !== next.term ||
+          prev.instructor !== next.instructor
+        );
+      }
+
+      function applyManifestMeta(manifest) {
+        const meta = getManifestMeta(manifest);
+        if (!meta) return;
+
+        // Keep title and header metadata in sync during incremental refresh.
+        if (meta.title) document.title = meta.title;
+
+        const courseEl = document.getElementById('toc-title');
+        const termEl = document.querySelector('.toc-term');
+        const instructorEl = document.querySelector('.toc-instructor');
+
+        if (courseEl) courseEl.textContent = meta.course || '';
+        if (termEl) termEl.textContent = meta.term || '';
+        if (instructorEl) instructorEl.textContent = meta.instructor || '';
+      }
+
+      async function incrementalUpdate() {
+        if (isUpdating) return;
+        isUpdating = true;
+        console.time('[Ctrl+R] total');
+
+        try {
+          const notePath = location.pathname.replace(/\/$/, '');
+          const reader = window.typstReader;
+
+          // Save state
+          const scrollY = window.scrollY;
+          const activeIdx = (reader && reader.pageSections && reader.pageSectionEls)
+            ? reader.pageSectionEls.findIndex(s => s.classList.contains('active'))
+            : -1;
+          if (reader && reader.saveProofToggleStateFromDom) {
+            reader.saveProofToggleStateFromDom();
+          }
+
+          // Fetch manifest
+          console.time('[Ctrl+R] fetch manifest');
+          const res = await fetch(notePath + '/content.manifest.json?t=' + Date.now());
+          if (!res.ok) throw new Error('No manifest');
+          const manifest = await res.json();
+          console.timeEnd('[Ctrl+R] fetch manifest');
+          const didMetaChange = metaChanged(cachedManifest, manifest);
+          if (didMetaChange) applyManifestMeta(manifest);
+
+          // Determine which sections changed
+          const changed = [];
+          for (let i = 0; i < manifest.sections.length; i++) {
+            if (!cachedManifest || !cachedManifest.sections[i] ||
+                cachedManifest.sections[i].hash !== manifest.sections[i].hash) {
+              changed.push(i);
+            }
+          }
+
+          // Nothing changed at all
+          if (changed.length === 0 && !didMetaChange && cachedManifest &&
+              manifest.sections.length === cachedManifest.sections.length) {
+            console.log('[Ctrl+R] no changes detected');
+            console.timeEnd('[Ctrl+R] total');
+            cachedManifest = manifest;
+            flashContentIndicator(reader, activeIdx);
+            return;
+          }
+
+          // Check if we can do surgical section replacement
+          const sameStructure = cachedManifest &&
+            manifest.sections.length === cachedManifest.sections.length &&
+            sectionWrappers &&
+            sectionWrappers.length === manifest.sections.length;
+
+          console.log('[Ctrl+R] changed sections:', changed.length, '/', manifest.sections.length,
+            sameStructure ? '(fast path)' : '(rebuild path)');
+
+          // Disable scroll anchoring during DOM mutations
+          document.documentElement.style.overflowAnchor = 'none';
+
+          if (sameStructure) {
+            // ── Fast path: replace only changed sections in-place ──
+            console.time('[Ctrl+R] fetch changed sections');
+            const fetched = await Promise.all(
+              changed.map(idx => fetchSection(notePath, idx))
+            );
+            console.timeEnd('[Ctrl+R] fetch changed sections');
+
+            console.time('[Ctrl+R] DOM update + reinit');
+            for (let i = 0; i < changed.length; i++) {
+              sectionWrappers[changed[i]].innerHTML = fetched[i];
+            }
+            reinitReader();
+            console.timeEnd('[Ctrl+R] DOM update + reinit');
+
+            // Restore active page section (skip if already correct)
+            if (reader && reader.pageSections && reader.pageSectionEls &&
+                activeIdx >= 0 && activeIdx < reader.pageSectionEls.length) {
+              if (!reader.pageSectionEls[activeIdx].classList.contains('active')) {
+                reader.activatePageSection(reader.pageSectionEls[activeIdx]);
+              }
+            }
+          } else {
+            // ── Rebuild: create section wrappers from fetched parts ──
+            const contentEl = document.getElementById('typst-content');
+            if (!contentEl) throw new Error('No content element');
+
+            console.time('[Ctrl+R] fetch all sections');
+            const parts = await Promise.all(
+              manifest.sections.map((_, i) => fetchSection(notePath, i))
+            );
+            console.timeEnd('[Ctrl+R] fetch all sections');
+
+            console.time('[Ctrl+R] DOM rebuild + reinit');
+            if (reader) {
+              reader.pageSections = false;
+              reader.pageSectionEls = null;
+            }
+            buildSectionWrappers(contentEl, parts);
+            reinitReader();
+            console.timeEnd('[Ctrl+R] DOM rebuild + reinit');
+
+            // Restore active page section
+            if (reader && reader.pageSections && reader.pageSectionEls &&
+                activeIdx >= 0 && activeIdx < reader.pageSectionEls.length) {
+              reader.activatePageSection(reader.pageSectionEls[activeIdx]);
+            }
+          }
+
+          // Pin scroll synchronously, then re-enable anchoring + flash after paint
+          window.scrollTo(0, scrollY);
+          requestAnimationFrame(() => {
+            window.scrollTo(0, scrollY);
+            document.documentElement.style.overflowAnchor = '';
+            flashContentIndicator(reader, activeIdx);
+          });
+
+          cachedManifest = manifest;
+          console.timeEnd('[Ctrl+R] total');
+        } catch (err) {
+          console.warn('Incremental update failed:', err);
+          console.timeEnd('[Ctrl+R] total');
+        } finally {
+          isUpdating = false;
+        }
+      }
+
+      window.incrementalUpdate = incrementalUpdate;
+
+      document.addEventListener('keydown', async (e) => {
+        if (e.ctrlKey && !e.metaKey && e.key === 'r') {
+          e.preventDefault();
+          try { await incrementalUpdate(); } catch (e) {}
+        }
+      });
+    })();
+
+  </script>
+</body>
+</html>

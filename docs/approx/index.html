@@ -84,11 +84,12 @@
       --typst-h1-padding-bottom: 0.9rem;
       --typst-h1-border-bottom-width: 1px;
 
-      --typst-h2-margin-top: 2.125rem;
+      --typst-h2-margin-top: 3.75rem;
       --typst-h2-margin-bottom: 0.75rem;
       --typst-h2-margin-bottom-before-h3: 0rem;
+      --typst-h2-section-end-gap: 3rem;
 
-      --typst-h3-margin-top: 1.5rem;
+      --typst-h3-margin-top: 2.5rem;
       --typst-h3-margin-bottom: 0.5rem;
       --typst-h3-margin-top-after-h2: 1rem;
 
@@ -572,6 +573,13 @@
       outline-offset: -1px;
     }
 
+    .toc-link.sidebar-keyboard-marker {
+      color: var(--text-toc);
+      background: var(--accent-soft);
+      outline: 1px solid var(--accent);
+      outline-offset: -1px;
+    }
+
     .toc-number {
       font-size: inherit;
       color: inherit;
@@ -597,6 +605,24 @@
     .toc-footer .settings-toggle {
       width: 36px;
       height: 36px;
+    }
+
+    .toc-mobile-toggle {
+      display: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 0;
+      border: 1px solid var(--toc-border);
+      background: var(--bg-toc);
+      color: var(--text-toc);
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      box-shadow: none;
+    }
+
+    .toc-mobile-toggle:hover {
+      background: var(--bg-toc-active);
     }
 
     /* Main Content */
@@ -630,9 +656,10 @@
       max-width: 100%;
     }
 
+    /* NOTE typst headings start at h2 so this is irrelevant */
     .typst-content h1 {
       font-family: var(--content-font);
-      font-size: 2.125rem;
+      font-size: 10rem;
       font-weight: 650;
       color: var(--text-primary);
       margin-top: var(--typst-h1-margin-top);
@@ -646,7 +673,7 @@
 
     .typst-content h2 {
       font-family: var(--content-font);
-      font-size: 1.3125rem;
+      font-size: 1.75rem;
       font-weight: 650;
       color: var(--text-primary);
       margin-top: var(--typst-h2-margin-top);
@@ -664,7 +691,7 @@
 
     .typst-content h3 {
       font-family: var(--content-font);
-      font-size: 1rem;
+      font-size: 1.5rem;
       font-weight: 600;
       color: var(--text-primary);
       margin-top: var(--typst-h3-margin-top);
@@ -679,7 +706,7 @@
 
     .typst-content h4 {
       font-family: var(--content-font);
-      font-size: 0.95rem;
+      font-size: 1rem;
       font-weight: 600;
       color: var(--text-secondary);
       margin-top: var(--typst-h4-margin-top);
@@ -763,10 +790,18 @@
     .typst-content pre code {
       background: none;
       padding: 0;
+      margin: 0;
       color: var(--code-pre-text);
       font-size: 0.85rem;
       line-height: 1.25;
       display: block;
+      white-space: pre;
+      overflow-wrap: normal;
+      tab-size: 4;
+    }
+
+    .typst-content pre code span {
+      white-space: inherit;
     }
 
     .code-copy-btn {
@@ -1723,9 +1758,20 @@
       }
     }
 
+    @media (max-width: 768px) {
+      .toc-mobile-toggle {
+        display: flex;
+        position: fixed;
+        bottom: 16px;
+        right: 16px;
+        z-index: 101;
+      }
+    }
+
     /* ── Paged sections (opt-in via Typst page-sections flag) ── */
     .page-section {
       display: none;
+      padding-bottom: var(--typst-h2-section-end-gap);
     }
     .page-section.active {
       display: block;
@@ -1795,6 +1841,14 @@
 </head>
 <body>
   <div class="reader">
+    <button class="toc-mobile-toggle" id="toc-mobile-toggle" type="button" aria-label="Show sidebar" aria-controls="toc" aria-expanded="false">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <line x1="4" y1="6" x2="20" y2="6"></line>
+        <line x1="4" y1="12" x2="20" y2="12"></line>
+        <line x1="4" y1="18" x2="20" y2="18"></line>
+      </svg>
+    </button>
+
     <!-- Table of Contents Sidebar -->
     <aside class="toc" id="toc">
       <header class="toc-header">
@@ -1987,6 +2041,7 @@
         this.tocList = document.getElementById('toc-list');
         this.tocTitle = document.getElementById('toc-title');
         this.tocOverlay = document.getElementById('toc-overlay');
+        this.mobileTocToggle = document.getElementById('toc-mobile-toggle');
         this.sectionJump = document.getElementById('section-jump');
         this.sectionJumpInput = document.getElementById('section-jump-input');
         this.sectionJumpStatus = document.getElementById('section-jump-status');
@@ -2009,6 +2064,8 @@
         this.activeSearchIndex = -1;
         this.sectionJumpMatches = [];
         this.activeSectionJumpIndex = -1;
+        this.sidebarMarkerIndex = -1;
+        this.sidebarMarkerIsImplicit = false;
         this._hashChangeAttached = false;
         this._navBackStack = [];
         this._navForwardStack = [];
@@ -2053,9 +2110,11 @@
         this.setupPageSections();
         this.setupScrollspy();
         this.setupMobileToggle();
+        this.setupSidebarKeyboardNavigation();
         this.setupSectionJump();
         this.setupSettingsPanel();
         this.setupKeybindsPanel();
+        this.setupHeadingTabNavigation();
         this.setupCodeBlockCopyButtons();
         this.setupFootnotes();
         this.setupProofToggles();
@@ -2211,6 +2270,117 @@
         }
       }
 
+      setupHeadingTabNavigation() {
+        document.addEventListener('keydown', (e) => {
+          if (e.key !== 'Tab' || !e.altKey || e.ctrlKey || e.metaKey) return;
+
+          if (this.isEditableElement(document.activeElement)) return;
+          if (this.keybindsPanel?.classList.contains('open')) return;
+          if (this.searchPanel?.classList.contains('open')) return;
+          if (this.sectionJump?.classList.contains('open')) return;
+          if (!this.moveSelectionToBigHeading(e.shiftKey ? -1 : 1)) return;
+
+          e.preventDefault();
+        }, true);
+      }
+
+      isEditableElement(element) {
+        return Boolean(element && (
+          element.tagName === 'TEXTAREA' ||
+          element.tagName === 'INPUT' ||
+          element.tagName === 'SELECT' ||
+          element.isContentEditable
+        ));
+      }
+
+      moveSelectionToBigHeading(direction) {
+        const headings = this.getBigHeadings();
+        if (headings.length === 0) return false;
+
+        const selection = window.getSelection();
+        const focusNode = selection?.focusNode || selection?.anchorNode || null;
+        const currentIndex = this.getCurrentBigHeadingIndex(headings, focusNode);
+        const targetIndex = this.getTargetBigHeadingIndex(headings, currentIndex, focusNode, direction);
+        const target = headings[targetIndex];
+        if (!target) return false;
+
+        const parentSection = target.closest('.page-section');
+        if (this.pageSections && parentSection) {
+          this.activatePageSection(parentSection);
+        }
+
+        this.placeSelectionAtElementEnd(target);
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return true;
+      }
+
+      getBigHeadings() {
+        if (this.pageSectionLevel) {
+          return Array.from(this.content.querySelectorAll('h' + this.pageSectionLevel));
+        }
+        if (this.headings.length > 0) {
+          const minLevel = Math.min(...this.headings.map(h => h.level));
+          return this.headings
+            .filter(h => h.level === minLevel)
+            .map(h => h.element)
+            .filter(Boolean);
+        }
+        return Array.from(this.content.querySelectorAll('h1, h2'));
+      }
+
+      getCurrentBigHeadingIndex(headings, focusNode) {
+        if (!focusNode) {
+          const activeSection = this.pageSectionEls?.find(sec => sec.classList.contains('active'));
+          const activeHeading = activeSection ? headings.find(h => activeSection.contains(h)) : null;
+          return Math.max(0, headings.indexOf(activeHeading));
+        }
+
+        const focusElement = focusNode.nodeType === Node.ELEMENT_NODE ? focusNode : focusNode.parentElement;
+        const containingIndex = headings.findIndex(heading => heading.contains(focusElement));
+        if (containingIndex >= 0) return containingIndex;
+
+        for (let i = headings.length - 1; i >= 0; i--) {
+          const order = headings[i].compareDocumentPosition(focusNode);
+          if (order & Node.DOCUMENT_POSITION_FOLLOWING) return i;
+        }
+        return 0;
+      }
+
+      getTargetBigHeadingIndex(headings, currentIndex, focusNode, direction) {
+        const current = headings[currentIndex];
+        if (!focusNode) return currentIndex;
+        if (direction < 0) {
+          if (current && focusNode && !current.contains(focusNode)) return currentIndex;
+          return Math.max(0, currentIndex - 1);
+        }
+        if (current && focusNode && current.contains(focusNode) && !this.isSelectionAtElementEnd(current)) {
+          return currentIndex;
+        }
+        return Math.min(headings.length - 1, currentIndex + 1);
+      }
+
+      isSelectionAtElementEnd(element) {
+        const selection = window.getSelection();
+        if (!selection || selection.rangeCount === 0) return false;
+
+        const current = selection.getRangeAt(0).cloneRange();
+        const end = document.createRange();
+        end.selectNodeContents(element);
+        end.collapse(false);
+        return current.compareBoundaryPoints(Range.START_TO_START, end) === 0;
+      }
+
+      placeSelectionAtElementEnd(element) {
+        const selection = window.getSelection();
+        if (!selection) return;
+
+        const range = document.createRange();
+        range.selectNodeContents(element);
+        range.collapse(false);
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
+
       extractHeadings() {
         // Find all headings (with or without IDs)
         const headingElements = this.content.querySelectorAll('h1, h2, h3, h4');
@@ -2357,9 +2527,16 @@
         this.tocList.querySelectorAll('.toc-link').forEach(link => {
           link.classList.toggle('active', link.dataset.id === id);
         });
+        if (this.sidebarMarkerIsImplicit) {
+          this.showSidebarMarkerForActiveLink(true);
+        }
       }
 
       setupMobileToggle() {
+        this.mobileTocToggle?.addEventListener('click', () => {
+          this.toggleMobileToc();
+        });
+
         document.addEventListener('keydown', (e) => {
           const key = typeof e.key === 'string' ? e.key.toLowerCase() : '';
 
@@ -2392,13 +2569,126 @@
       }
 
       toggleMobileToc() {
-        this.toc.classList.toggle('open');
-        this.tocOverlay.classList.toggle('open');
+        if (this.toc.classList.contains('open')) {
+          this.closeMobileToc();
+        } else {
+          this.openMobileToc();
+        }
+      }
+
+      openMobileToc() {
+        this.toc.classList.add('open');
+        this.tocOverlay.classList.add('open');
+        this.mobileTocToggle?.setAttribute('aria-expanded', 'true');
+        this.mobileTocToggle?.setAttribute('aria-label', 'Hide sidebar');
+        this.showSidebarMarkerForActiveLink();
       }
 
       closeMobileToc() {
         this.toc.classList.remove('open');
         this.tocOverlay.classList.remove('open');
+        this.mobileTocToggle?.setAttribute('aria-expanded', 'false');
+        this.mobileTocToggle?.setAttribute('aria-label', 'Show sidebar');
+        this.clearSidebarMarker();
+        this.closeSectionJump();
+        this.closeGlobalSearch();
+      }
+
+      setupSidebarKeyboardNavigation() {
+        this.toc?.addEventListener('focusin', () => {
+          this.showSidebarMarkerForActiveLink();
+        });
+
+        this.toc?.addEventListener('focusout', (e) => {
+          if (this.sidebarMarkerIsImplicit && !this.toc.contains(e.relatedTarget)) {
+            this.clearSidebarMarker();
+          }
+        });
+
+        document.addEventListener('keydown', (e) => {
+          if (e.ctrlKey || e.metaKey || e.altKey) return;
+          if (!['ArrowDown', 'ArrowUp', 'Enter', 'Escape'].includes(e.key)) return;
+          if (this.searchPanel?.classList.contains('open') || this.keybindsPanel?.classList.contains('open')) return;
+          if (this.sectionJump?.classList.contains('open')) return;
+
+          const active = document.activeElement;
+          const isEditable = active && (
+            active.tagName === 'INPUT' ||
+            active.tagName === 'TEXTAREA' ||
+            active.tagName === 'SELECT' ||
+            active.isContentEditable
+          );
+          if (isEditable || !this.isSidebarContextActive()) return;
+
+          if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            this.moveSidebarMarker(1);
+          } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            this.moveSidebarMarker(-1);
+          } else if (e.key === 'Enter' && this.sidebarMarkerIndex >= 0) {
+            e.preventDefault();
+            this.activateSidebarMarker();
+          } else if (e.key === 'Escape' && this.sidebarMarkerIndex >= 0) {
+            e.preventDefault();
+            this.clearSidebarMarker();
+          }
+        });
+      }
+
+      getSidebarTocLinks() {
+        return Array.from(this.tocList?.querySelectorAll('.toc-link') || []);
+      }
+
+      getActiveSidebarLinkIndex(links) {
+        return links.findIndex(link => link.classList.contains('active'));
+      }
+
+      showSidebarMarkerForActiveLink(force = false) {
+        if (!force && this.sidebarMarkerIndex >= 0) return;
+        const links = this.getSidebarTocLinks();
+        if (links.length === 0) return;
+
+        const activeIndex = this.getActiveSidebarLinkIndex(links);
+        if (activeIndex < 0) return;
+        this.setSidebarMarker(activeIndex, links, true);
+      }
+
+      moveSidebarMarker(delta) {
+        const links = this.getSidebarTocLinks();
+        if (links.length === 0) return;
+
+        const markerStillValid = this.sidebarMarkerIndex >= 0 && this.sidebarMarkerIndex < links.length;
+        const baseIndex = markerStillValid
+          ? this.sidebarMarkerIndex
+          : this.getActiveSidebarLinkIndex(links);
+        const fallbackIndex = delta > 0 ? -1 : links.length;
+        const nextIndex = (baseIndex >= 0 ? baseIndex : fallbackIndex) + delta;
+        this.setSidebarMarker((nextIndex + links.length) % links.length, links);
+      }
+
+      setSidebarMarker(index, links = this.getSidebarTocLinks(), implicit = false) {
+        this.clearSidebarMarker();
+        const link = links[index];
+        if (!link) return;
+        this.sidebarMarkerIndex = index;
+        this.sidebarMarkerIsImplicit = implicit;
+        link.classList.add('sidebar-keyboard-marker');
+        link.scrollIntoView({ block: 'nearest' });
+      }
+
+      clearSidebarMarker() {
+        this.sidebarMarkerIndex = -1;
+        this.sidebarMarkerIsImplicit = false;
+        this.tocList?.querySelectorAll('.sidebar-keyboard-marker').forEach(link => {
+          link.classList.remove('sidebar-keyboard-marker');
+        });
+      }
+
+      activateSidebarMarker() {
+        const link = this.getSidebarTocLinks()[this.sidebarMarkerIndex];
+        if (!link) return;
+        link.click();
       }
 
       setupSectionJump() {
@@ -2462,6 +2752,7 @@
       }
 
       closeSectionJump() {
+        if (!this.sectionJump || !this.sectionJumpInput || !this.sectionJumpStatus) return;
         this.sectionJump.classList.remove('open');
         this.sectionJumpInput.value = '';
         this.sectionJumpStatus.textContent = '';
@@ -2651,7 +2942,13 @@
       }
 
       closeGlobalSearch() {
+        if (!this.searchPanel) return;
         this.searchPanel.classList.remove('open');
+        this.searchMatches = [];
+        this.activeSearchIndex = -1;
+        if (this.searchInput) this.searchInput.value = '';
+        if (this.searchResultsEl) this.searchResultsEl.innerHTML = '';
+        if (this.searchCount) this.searchCount.textContent = '';
       }
 
       escapeHtml(value) {
