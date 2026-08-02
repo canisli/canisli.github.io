@@ -1,0 +1,30 @@
+<h1>6. AVL Trees</h1><p>Representing a set or sequence with a binary tree, depending on what we key. In AVL sequence we don’t key by index rather we let subtree augmentations maintain the structure.</p><p>Idea. Use augmentation to store things like height and size so we can refer to them in <math><mi mathvariant="normal">O</mi><mrow><mo>(</mo><mn>1</mn><mo>)</mo></mrow></math>. This will make AVL trees possible.</p><p>DFS Algorithm for balancing a tree</p><ul class="list-tight" style="list-style-type: disc;"><li>Check if left subtree is balanced, if not balance it</li><li>Check if right subtree is balanced, if not balance it.</li><li>Balance the current node.</li></ul><p>We can rebalance using <math><mi mathvariant="normal">O</mi><mrow><mo>(</mo><mn>1</mn><mo>)</mo></mrow></math> rotation operations. In particular, rotations are defined as follows:</p><ul class="list-tight" style="list-style-type: disc;"><li>Right Rotate <math><mi>𝑦</mi></math><ul class="list-tight" style="list-style-type: circle;"><li>Given a subtree rooted at node y, where x is y’s left child:<ul class="list-tight" style="list-style-type: '- ';"><li>x becomes the new root.</li><li>y becomes the right child of x.</li><li>x’s original right child is assigned to y’s left child.</li></ul></li></ul></li></ul><pre><code>                y             x
+               / \           / \
+              x   C   →    A   y
+             / \               / \
+            A   B             B   C</code></pre><ul class="list-tight" style="list-style-type: disc;"><li>Left Rotate <math><mi>𝑦</mi></math><ul class="list-tight" style="list-style-type: circle;"><li>Given a subtree rooted at node x, where y is x’s right child:<ul class="list-tight" style="list-style-type: '- ';"><li>y becomes the new root.</li><li>x becomes the left child of y.</li><li>y’s original left child is assigned to x’s right child.</li></ul></li></ul></li></ul><pre><code>                x             y
+               / \           / \
+              A   y   →    x   C
+                 / \       / \
+                B   C     A   B</code></pre><p>If we insert a node no further rebalancing is required. If we delete a node the rebalancing may propagate upwards: Example</p><pre><code>     <math><mi mathvariant="normal">O</mi></math>
+    / \
+   N   1
+        /\
+      N  B (N-1)
+
+<math><mi mathvariant="normal">O</mi></math>riginaly let $B$ take the form
+        b
+      / \
+N-3    2
+         / \
+   N-3 N-4
+
+delete on the bottom right branch
+
+        b
+      / \
+N-3    2
+         / \
+   N-3 N-5
+
+Rebalancing at 2 makes this tree have height $n-2$, requiring us to rebalance at 1.</code></pre><div class="thm-box thm-proposition"><span class="thm-box-title">Proposition 2 (Why AVL Sequences work).</span> Rebalancing operations don’t change the in-order traversal</div>
