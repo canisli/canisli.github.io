@@ -1,0 +1,2070 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bridge Rollouts</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b0d0c;
+      --panel: #121614;
+      --panel-2: #191e1b;
+      --line: #2b332e;
+      --text: #eef3ef;
+      --muted: #929d96;
+      --lime: #b8f45f;
+      --amber: #ffcb6b;
+      --cyan: #72d8d0;
+      --red: #ff7b72;
+    }
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    body {
+      margin: 0;
+      background: radial-gradient(circle at 70% -10%, #1a241e 0, var(--bg) 42%);
+      color: var(--text);
+      font: 14px/1.4 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      min-height: 100vh;
+    }
+    button, input { font: inherit; }
+    .shell { display: grid; grid-template-columns: 280px minmax(0, 1fr); min-height: 100vh; }
+    aside { border-right: 1px solid var(--line); padding: 22px 16px; background: #0e110fdd; }
+    h1 { font: 700 18px/1.1 ui-sans-serif, system-ui, sans-serif; margin: 0 0 6px; }
+    .subtitle { color: var(--muted); font-size: 11px; margin-bottom: 20px; }
+    .toolbar { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+    button {
+      color: var(--text); background: var(--panel-2); border: 1px solid var(--line);
+      border-radius: 6px; padding: 7px 10px; cursor: pointer;
+    }
+    button:hover { border-color: #536059; }
+    button:disabled { cursor: default; opacity: .5; }
+    .primary-action { color: #0b0d0c; background: var(--lime); border-color: var(--lime); font-weight: 700; }
+    .primary-action:hover { border-color: #e1ffae; }
+    .run-list { display: grid; gap: 10px; }
+    .run-group { border: 1px solid var(--line); border-radius: 8px; background: var(--panel); overflow: hidden; }
+    .run-group[open] { border-color: #465149; }
+    .run-header { cursor: pointer; padding: 10px 11px; list-style: none; }
+    .run-header::-webkit-details-marker { display: none; }
+    .run-name { font-weight: 700; overflow-wrap: anywhere; }
+    .run-meta { color: var(--muted); font-size: 10px; margin-top: 4px; }
+    .run-rollouts { display: grid; gap: 5px; padding: 0 7px 7px; border-top: 1px solid var(--line); }
+    .rollout {
+      width: 100%; text-align: left; padding: 9px; background: var(--panel-2);
+      border: 1px solid transparent; border-radius: 6px;
+    }
+    .rollout.active { border-color: var(--lime); box-shadow: inset 3px 0 var(--lime); }
+    .rollout-name { font-weight: 700; text-transform: capitalize; margin-bottom: 7px; }
+    .rollout-meta { display: flex; gap: 7px; flex-wrap: wrap; color: var(--muted); font-size: 10px; }
+    .badge { border-radius: 999px; padding: 2px 7px; border: 1px solid var(--line); }
+    .badge.success { color: var(--lime); border-color: #557a35; }
+    .badge.incomplete { color: var(--amber); border-color: #6d5935; }
+    main { padding: 22px; min-width: 0; }
+    .heading { display: flex; justify-content: space-between; gap: 20px; align-items: start; margin-bottom: 14px; }
+    h2 { font: 700 22px/1.15 ui-sans-serif, system-ui, sans-serif; margin: 0 0 5px; text-transform: capitalize; }
+    .source-line { color: var(--muted); font-size: 11px; }
+    .metrics { display: flex; gap: 18px; text-align: right; }
+    .metric strong { display: block; color: var(--lime); font-size: 18px; }
+    .metric span { color: var(--muted); font-size: 9px; text-transform: uppercase; letter-spacing: .08em; }
+    .stage { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(280px, .7fr); gap: 14px; align-items: start; }
+    .primary-stack { display: grid; gap: 14px; min-width: 0; }
+    .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+    .panel-title { display: flex; justify-content: space-between; padding: 10px 12px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .08em; }
+    .fps {
+      aspect-ratio: 16/9; background: #080a09; position: relative; display: grid;
+      place-items: center; overflow: hidden;
+    }
+    .fps canvas { width: 100%; height: 100%; display: block; }
+    .fps canvas:focus-visible { outline: 2px solid var(--lime); outline-offset: -2px; }
+    .empty { color: var(--muted); text-align: center; max-width: 360px; padding: 20px; }
+    .empty strong { color: var(--amber); display: block; margin-bottom: 7px; }
+    .ground-truth {
+      position: absolute; top: 10px; left: 10px; z-index: 2; background: #0b0d0cdd;
+      border: 1px solid #6d5935; color: var(--amber); border-radius: 999px; padding: 4px 8px; font-size: 9px;
+    }
+    .shift-indicator {
+      position: absolute; left: 16px; bottom: 16px; z-index: 2; padding: 6px 9px;
+      border: 1px solid var(--line); border-radius: 5px; background: #0b0d0cdd;
+      color: var(--muted); font-size: 10px; opacity: .55;
+    }
+    .shift-indicator.on { color: var(--lime); border-color: #557a35; opacity: 1; box-shadow: inset 3px 0 var(--lime); }
+    .frame-note { padding: 8px 12px; min-height: 35px; color: var(--muted); font-size: 10px; border-top: 1px solid var(--line); }
+    .side-stack { display: grid; gap: 14px; align-content: start; }
+    #actorFrame {
+      width: 100%; aspect-ratio: 16/9; display: block; background: #0c100d;
+      image-rendering: pixelated;
+    }
+    #thirdPerson { width: 100%; aspect-ratio: 16/9; display: block; background: #0c100d; }
+    #map { width: 100%; aspect-ratio: 1; display: block; background: #0c100d; }
+    .telemetry { display: grid; grid-template-columns: 1fr 1fr; }
+    .cell { padding: 10px 12px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .cell:nth-child(2n) { border-right: 0; }
+    .cell label { display: block; color: var(--muted); font-size: 9px; text-transform: uppercase; margin-bottom: 3px; }
+    .cell output { font-size: 12px; }
+    .controls { padding: 13px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+    .transport { display: flex; align-items: center; gap: 10px; }
+    .live-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .live-state { display: grid; gap: 2px; }
+    .live-state strong { color: var(--lime); }
+    .live-state span { color: var(--muted); font-size: 10px; }
+    .live-buttons { display: flex; gap: 7px; }
+    .keybinds { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }
+    .keybind { color: var(--muted); border: 1px solid var(--line); border-radius: 5px; padding: 5px 7px; font-size: 10px; }
+    .keybind.on { color: var(--lime); border-color: #557a35; background: #172016; }
+    kbd { color: var(--text); font: inherit; font-weight: 700; }
+    #timeline { flex: 1; accent-color: var(--lime); }
+    .tick { min-width: 94px; text-align: right; color: var(--cyan); }
+    .actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 11px; min-height: 22px; }
+    .action { border: 1px solid var(--line); background: #0f1311; border-radius: 4px; padding: 3px 6px; font-size: 10px; }
+    .action.on { color: var(--lime); border-color: #557a35; }
+    .action.camera { color: var(--cyan); }
+    .action.place { color: var(--amber); border-color: #6d5935; }
+    .legend { display: flex; gap: 14px; color: var(--muted); font-size: 9px; padding: 9px 12px; border-top: 1px solid var(--line); }
+    .dot { width: 7px; height: 7px; display: inline-block; margin-right: 4px; border-radius: 50%; }
+    body.simulator-mode { overflow: hidden; background: #000; }
+    body.simulator-mode .shell { display: block; height: 100vh; min-height: 0; }
+    body.simulator-mode aside,
+    body.simulator-mode .heading,
+    body.simulator-mode .side-stack { display: none; }
+    body.simulator-mode main,
+    body.simulator-mode .stage,
+    body.simulator-mode .primary-stack { display: block; width: 100%; height: 100%; padding: 0; }
+    body.simulator-mode .primary-stack > .panel {
+      width: 100%; height: 100%; border: 0; border-radius: 0;
+    }
+    body.simulator-mode .primary-stack > .panel .panel-title,
+    body.simulator-mode .primary-stack > .panel .frame-note { display: none; }
+    body.simulator-mode .fps { width: 100%; height: 100%; aspect-ratio: auto; }
+    body.simulator-mode .controls {
+      position: fixed; z-index: 5; top: 18px; right: 18px; width: min(680px, calc(100vw - 36px));
+      border-color: #536059; background: #0b0d0ce8; box-shadow: 0 12px 40px #0008;
+      transition: opacity .18s ease;
+    }
+    body.simulator-mode .actions { display: none; }
+    body.mouse-captured .controls { width: auto; opacity: .68; pointer-events: none; }
+    body.mouse-captured { cursor: none; }
+    body.simulator-mode.mouse-captured .controls { display: none; }
+    body.mouse-captured .fps canvas { outline: none; }
+    body.mouse-captured .live-buttons,
+    body.mouse-captured .keybinds,
+    body.mouse-captured .live-state > span:first-of-type { display: none; }
+    body.mouse-captured .live-header { justify-content: end; }
+    body.mouse-captured .live-state { text-align: right; }
+    body.standalone-simulator,
+    body.standalone-simulator .fps { background: #000; }
+    body.standalone-simulator .ground-truth,
+    body.standalone-simulator .shift-indicator,
+    body.standalone-simulator .controls { display: none; }
+    body.standalone-simulator .fps canvas { outline: none; }
+    .performance-diagnostics {
+      position: fixed; z-index: 20; left: 12px; bottom: 12px; margin: 0;
+      padding: 8px 10px; color: #dff; background: #071019dd;
+      font: 12px/1.45 ui-monospace, monospace; white-space: pre;
+      pointer-events: none;
+    }
+    @media (max-width: 900px) {
+      .shell { grid-template-columns: 1fr; }
+      aside { border-right: 0; border-bottom: 1px solid var(--line); padding: 12px 14px; max-height: 190px; overflow: auto; }
+      aside .subtitle { margin-bottom: 8px; }
+      .toolbar { margin-bottom: 8px; }
+      .run-list { display: flex; overflow-x: auto; }
+      .run-group { min-width: 240px; }
+      main { padding: 14px; }
+      .stage { grid-template-columns: 1fr; }
+      .side-stack { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside>
+      <h1>Training runs</h1>
+      <div class="subtitle">Run → rollout iteration</div>
+      <div class="toolbar"><button id="playSimulator" class="primary-action">Play simulator</button><button id="refresh">Refresh runs</button></div>
+      <div id="runs" class="run-list"><div class="subtitle">Loading…</div></div>
+    </aside>
+    <main>
+      <div class="heading">
+        <div><h2 id="title">Select a rollout</h2><div id="source" class="source-line"></div></div>
+        <div class="metrics">
+          <div class="metric"><strong id="ticksMetric">—</strong><span>ticks</span></div>
+          <div class="metric"><strong id="blocksMetric">—</strong><span>placements</span></div>
+          <div class="metric"><strong id="speedMetric">—</strong><span>blocks/s</span></div>
+        </div>
+      </div>
+      <div class="stage">
+        <div class="primary-stack">
+          <section class="panel">
+            <div class="panel-title"><span>First-person simulation</span><span id="frameTick"></span></div>
+            <div class="fps">
+              <div class="ground-truth">Surrogate simulation · not Forge footage</div>
+              <div id="shiftIndicator" class="shift-indicator">SHIFT · released</div>
+              <canvas id="simFrame" width="1280" height="720" tabindex="0" aria-label="First-person rendering of the simulator rollout"></canvas>
+            </div>
+            <div id="frameNote" class="frame-note">Physics and actions update at 20 Hz; only this viewer interpolates recorded poses for smooth playback.</div>
+          </section>
+          <section class="controls">
+            <div id="replayControls" class="transport">
+              <button id="play" aria-keyshortcuts="Space">Play</button><button id="stepBack">−1</button><button id="stepForward">+1</button>
+              <input id="timeline" type="range" min="1" max="1" value="1" aria-label="Rollout tick">
+              <div id="tick" class="tick">tick —</div>
+            </div>
+            <div id="liveControls" hidden>
+              <div class="live-header">
+                <div class="live-state"><strong id="liveStatus">Ready</strong><span>Click the view to capture the mouse · Escape releases it</span><span id="renderRate">render — FPS · physics 20 TPS</span></div>
+                <div class="live-buttons"><button id="captureMouse">Capture mouse</button><button id="livePause">Start</button><button id="liveReset">Reset</button><button id="exitSimulator">Exit</button></div>
+              </div>
+              <div class="keybinds" aria-label="Simulator keybinds">
+                <span class="keybind" data-codes="KeyW KeyA KeyS KeyD"><kbd>WASD</kbd> move</span>
+                <span class="keybind" data-codes="Space"><kbd>Space</kbd> jump</span>
+                <span class="keybind" data-codes="ShiftLeft ShiftRight"><kbd>Shift</kbd> sneak</span>
+                <span class="keybind" data-codes="ControlLeft ControlRight"><kbd>Ctrl</kbd> toggle sprint</span>
+                <span class="keybind" data-codes="ArrowLeft ArrowRight ArrowUp ArrowDown"><kbd>Arrows</kbd> look</span>
+                <span class="keybind" data-codes="KeyF MouseRight"><kbd>F / Right-click</kbd> place</span>
+                <span class="keybind" data-codes="KeyR"><kbd>R</kbd> reset</span>
+              </div>
+            </div>
+            <div id="actions" class="actions"></div>
+          </section>
+        </div>
+        <div class="side-stack">
+          <section class="panel">
+            <div class="panel-title"><span>Exact actor input</span><span id="actorFrameTick">160×90 · 20 Hz</span></div>
+            <canvas id="actorFrame" width="160" height="90" aria-label="Exact RGB pixels supplied to the actor"></canvas>
+            <div class="frame-note">Pre-action RGB only. Previous controls are embedded separately; telemetry below is critic/viewer data.</div>
+          </section>
+          <section class="panel">
+            <div class="panel-title"><span>Third-person simulation</span><span>chase camera</span></div>
+            <canvas id="thirdPerson" width="640" height="360" aria-label="Third-person rendering of the simulator rollout"></canvas>
+          </section>
+          <section class="panel">
+            <div class="panel-title"><span>Trajectory</span><span>trace geometry</span></div>
+            <canvas id="map" width="520" height="520"></canvas>
+            <div class="legend">
+              <span><i class="dot" style="background:var(--lime)"></i>player</span>
+              <span><i class="dot" style="background:#788078"></i>start</span>
+              <span><i class="dot" style="background:#f9d234"></i>destination</span>
+              <span><i class="dot" style="background:var(--amber)"></i>placed</span>
+              <span><i class="dot" style="background:var(--cyan)"></i>camera</span>
+            </div>
+          </section>
+          <section class="panel telemetry">
+            <div class="cell"><label>Position</label><output id="position">—</output></div>
+            <div class="cell"><label>Velocity</label><output id="velocity">—</output></div>
+            <div class="cell"><label>Yaw / pitch</label><output id="view">—</output></div>
+            <div class="cell"><label>Reward</label><output id="reward">—</output></div>
+            <div class="cell"><label>Grounded</label><output id="grounded">—</output></div>
+            <div class="cell"><label>Placed</label><output id="placed">—</output></div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="simulator.js"></script>
+  <script>
+    const $ = id => document.getElementById(id);
+    const BRIDGE_LAST_TIME_KEY = 'bridge-simulator-last-time-ms';
+    const BRIDGE_BEST_TIME_KEY = 'bridge-simulator-best-time-ms';
+    const LIVE_TICK_MS = 50;
+    const diagnosticsParameters = new URLSearchParams(location.search);
+    const diagnosticsEnabled = diagnosticsParameters.has('diagnostics');
+    const diagnosticAutoForward = diagnosticsParameters.has('autoforward');
+    const performanceDiagnostics = {
+      frameGaps: [], renderTimes: [], physicsGaps: [], stepStartGaps: [], requestTimes: [],
+      movementSpeeds: [], movingFrames: 0, heldMovingFrames: 0,
+      cappedInterpolationFrames: 0,
+      lastFrameTime: null, lastPhysicsTime: null, lastStepStartTime: null, lastPublishedAt: 0,
+    };
+    const performanceSampleSummaries = new WeakMap();
+
+    function recordPerformanceSample(samples, value) {
+      if (!diagnosticsEnabled) return;
+      if (!Number.isFinite(value) || value < 0) return;
+      samples.push(value);
+      if (samples.length > 10000) samples.splice(0, 5000);
+      let summary = performanceSampleSummaries.get(samples);
+      if (!summary) {
+        const scale = samples === performanceDiagnostics.movementSpeeds ? 100000 : 10;
+        summary = {bins: new Uint32Array(2001), count: 0, max: 0, scale};
+        performanceSampleSummaries.set(samples, summary);
+      }
+      const bin = Math.min(summary.bins.length - 1, Math.floor(value * summary.scale));
+      summary.bins[bin] += 1;
+      summary.count += 1;
+      summary.max = Math.max(summary.max, value);
+    }
+
+    function summarizedPerformanceSample(samples, percentile) {
+      const summary = performanceSampleSummaries.get(samples);
+      if (!summary?.count) return {percentile: 0, max: 0};
+      const target = summary.count * percentile;
+      let cumulative = 0, bin = 0;
+      for (; bin < summary.bins.length; bin++) {
+        cumulative += summary.bins[bin];
+        if (cumulative >= target) break;
+      }
+      return {percentile: bin / summary.scale, max: summary.max};
+    }
+
+    function publishPerformanceDiagnostics(now) {
+      if (!diagnosticsEnabled || now - performanceDiagnostics.lastPublishedAt < 1000) return;
+      performanceDiagnostics.lastPublishedAt = now;
+      const output = $('performanceDiagnostics');
+      if (!output) return;
+      const line = (name, samples) => {
+        const summary = summarizedPerformanceSample(samples, .99);
+        return `${name.padEnd(6)} p99 ${summary.percentile.toFixed(2)} ms · max ${summary.max.toFixed(2)} ms`;
+      };
+      const movementLow = summarizedPerformanceSample(performanceDiagnostics.movementSpeeds, .01);
+      const movementHigh = summarizedPerformanceSample(performanceDiagnostics.movementSpeeds, .99);
+      output.textContent = [
+        line('frame', performanceDiagnostics.frameGaps),
+        line('render', performanceDiagnostics.renderTimes),
+        line('tick', performanceDiagnostics.physicsGaps),
+        line('start', performanceDiagnostics.stepStartGaps),
+        line('http', performanceDiagnostics.requestTimes),
+        `motion p01 ${movementLow.percentile.toFixed(4)} · p99 ${movementHigh.percentile.toFixed(4)} blocks/ms`,
+        `holds  ${performanceDiagnostics.heldMovingFrames} / ${performanceDiagnostics.movingFrames} moving frames`,
+        `capped ${performanceDiagnostics.cappedInterpolationFrames} interpolation frames`,
+      ].join('\n');
+    }
+    function loadBridgeTime(key) {
+      try {
+        const value = Number(localStorage.getItem(key));
+        return value > 0 ? value : null;
+      } catch (_) {
+        return null;
+      }
+    }
+    function saveBridgeTime(key, value) {
+      try { localStorage.setItem(key, String(value)); } catch (_) {}
+    }
+    const state = {
+      runs: [], selected: null, tickIndex: 0, playhead: 0, timer: null, lastTime: 0,
+      actorFrameRequest: 0,
+      mode: 'replay',
+      live: {
+        sessionId: null, running: false, done: false, completed: false,
+        timer: null, inFlight: false,
+        keys: new Set(), mouseUse: false, mouseFallback: false, pendingClick: false,
+        renderFrame: null, renderLastTime: 0, renderPose: null,
+        renderTickFrom: null, renderTickTo: null, renderTickStartedAt: 0,
+        frameCount: 0, frameWindowStart: 0, renderFps: 0,
+        cameraYaw: 0, cameraPitch: 0, pendingYaw: 0, pendingPitch: 0,
+        fovMultiplier: 1, bobDistance: 0, bobYaw: 0, bobPitch: 0,
+        sprintToggled: true, clickTimes: {left: [], right: []},
+        lastShiftRightClickTime: -Infinity,
+        lastPlacementTime: 0,
+        runStartedAt: null,
+        lastTimeMs: loadBridgeTime(BRIDGE_LAST_TIME_KEY),
+        bestTimeMs: loadBridgeTime(BRIDGE_BEST_TIME_KEY),
+      },
+    };
+    const format = (value, digits = 3) => Number.isFinite(value) ? Number(value).toFixed(digits) : '—';
+    const deg = radians => ((radians || 0) * 180 / Math.PI);
+    const formatBytes = bytes => bytes >= 1024 * 1024
+      ? `${format(bytes / (1024 * 1024), 1)} MB`
+      : `${Math.max(1, Math.round(bytes / 1024))} KB`;
+    const heldItemFrameCache = new Map();
+    let hotbarBlockIconCache = null;
+    let worldWebGlRenderer = null;
+    const HELD_ITEM_SWING_FRAMES = 16;
+
+    function createTileTexture(seed, paint) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 16; canvas.height = 16;
+      const context = canvas.getContext('2d', {willReadFrequently: true});
+      let value = seed >>> 0;
+      const random = () => {
+        value = (Math.imul(value, 1664525) + 1013904223) >>> 0;
+        return value / 4294967296;
+      };
+      paint(context, random);
+      return {
+        image: canvas,
+        pixels: context.getImageData(0, 0, 16, 16).data,
+      };
+    }
+
+    // Original procedural materials: cool aggregate, ivory ceramic, and sunmetal.
+    const aggregateTexture = createTileTexture(0x5a17, (context, random) => {
+      context.fillStyle = '#68747a'; context.fillRect(0, 0, 16, 16);
+      const colors = ['#566268', '#77848a', '#829096', '#5f6b71'];
+      for (let index = 0; index < 34; index++) {
+        const width = 1 + Math.floor(random() * 4);
+        const height = 1 + Math.floor(random() * 2);
+        context.fillStyle = colors[Math.floor(random() * colors.length)];
+        context.fillRect(Math.floor(random() * 16), Math.floor(random() * 16), width, height);
+      }
+      context.fillStyle = '#a78064';
+      for (let index = 0; index < 4; index++) {
+        context.fillRect(Math.floor(random() * 16), Math.floor(random() * 16), 1, 1);
+      }
+    });
+    const ceramicSideTexture = createTileTexture(0xc341, (context, random) => {
+      context.fillStyle = '#e7e1d5'; context.fillRect(0, 0, 16, 16);
+      context.fillStyle = '#c9c3b8';
+      context.fillRect(0, 3, 16, 1); context.fillRect(0, 12, 16, 1);
+      context.fillStyle = '#f4efe5';
+      context.fillRect(0, 4, 16, 2); context.fillRect(0, 13, 16, 2);
+      context.fillStyle = '#b8b6b0';
+      for (let index = 0; index < 5; index++) {
+        context.fillRect(Math.floor(random() * 15), 2 + Math.floor(random() * 12), 2, 1);
+      }
+    });
+    const ceramicTopTexture = createTileTexture(0xc342, (context, random) => {
+      context.fillStyle = '#eee9df'; context.fillRect(0, 0, 16, 16);
+      context.strokeStyle = '#cbc6bc'; context.lineWidth = 1;
+      context.beginPath(); context.moveTo(-2, 11); context.lineTo(6, 7);
+      context.lineTo(12, 8); context.lineTo(18, 4); context.stroke();
+      context.fillStyle = '#faf6ed';
+      for (let index = 0; index < 12; index++) {
+        context.fillRect(Math.floor(random() * 16), Math.floor(random() * 16), 1, 1);
+      }
+    });
+    const ceramicBottomTexture = createTileTexture(0xc343, (context) => {
+      context.fillStyle = '#c4beb3'; context.fillRect(0, 0, 16, 16);
+      context.fillStyle = '#aaa59c';
+      for (let y = 1; y < 16; y += 4) context.fillRect(0, y, 16, 1);
+    });
+    const sunmetalTexture = createTileTexture(0x501d, (context, random) => {
+      context.fillStyle = '#d69232'; context.fillRect(0, 0, 16, 16);
+      context.fillStyle = '#f0b84f';
+      context.fillRect(1, 1, 14, 2); context.fillRect(1, 4, 2, 10);
+      context.fillStyle = '#a96525';
+      context.fillRect(1, 14, 14, 1); context.fillRect(14, 3, 1, 12);
+      for (let index = 0; index < 10; index++) {
+        context.fillStyle = random() > .5 ? '#e7a640' : '#bf7b29';
+        context.fillRect(3 + Math.floor(random() * 10), 3 + Math.floor(random() * 10), 1, 1);
+      }
+    });
+    const worldBlockTextures = [
+      aggregateTexture, sunmetalTexture, ceramicSideTexture,
+      ceramicTopTexture, ceramicBottomTexture,
+    ];
+
+    let audioContext = null;
+
+    function primeGameAudio() {
+      if (!audioContext) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) audioContext = new AudioContext();
+      }
+      if (audioContext?.state === 'suspended') audioContext.resume().catch(() => {});
+    }
+
+    function audioEnvelope(gain, now, peak, duration) {
+      gain.gain.setValueAtTime(.0001, now);
+      gain.gain.exponentialRampToValueAtTime(peak, now + .006);
+      gain.gain.exponentialRampToValueAtTime(.0001, now + duration);
+    }
+
+    function playBlockPlaceSound() {
+      primeGameAudio();
+      if (!audioContext) return;
+      const now = audioContext.currentTime;
+      const noiseLength = Math.floor(audioContext.sampleRate * .075);
+      const buffer = audioContext.createBuffer(1, noiseLength, audioContext.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let index = 0; index < data.length; index++) {
+        const decay = 1 - index / data.length;
+        data[index] = (Math.random() * 2 - 1) * decay;
+      }
+      const noise = audioContext.createBufferSource();
+      const filter = audioContext.createBiquadFilter();
+      const noiseGain = audioContext.createGain();
+      noise.buffer = buffer; filter.type = 'bandpass';
+      filter.frequency.value = 720 + Math.random() * 180;
+      filter.Q.value = .7;
+      audioEnvelope(noiseGain, now, .16, .075);
+      noise.connect(filter).connect(noiseGain).connect(audioContext.destination);
+      noise.start(now); noise.stop(now + .08);
+
+      const knock = audioContext.createOscillator();
+      const knockGain = audioContext.createGain();
+      knock.type = 'triangle';
+      knock.frequency.setValueAtTime(145 + Math.random() * 18, now);
+      knock.frequency.exponentialRampToValueAtTime(82, now + .055);
+      audioEnvelope(knockGain, now, .12, .065);
+      knock.connect(knockGain).connect(audioContext.destination);
+      knock.start(now); knock.stop(now + .07);
+    }
+
+    function playFinishSound() {
+      primeGameAudio();
+      if (!audioContext) return;
+      const now = audioContext.currentTime;
+      [293.66, 369.99, 440, 587.33].forEach((frequency, index) => {
+        const oscillator = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        const start = now + index * .085;
+        oscillator.type = index === 3 ? 'sine' : 'triangle';
+        oscillator.frequency.value = frequency;
+        gain.gain.setValueAtTime(.0001, start);
+        gain.gain.exponentialRampToValueAtTime(.11, start + .018);
+        gain.gain.exponentialRampToValueAtTime(.0001, start + .32);
+        oscillator.connect(gain).connect(audioContext.destination);
+        oscillator.start(start); oscillator.stop(start + .34);
+      });
+    }
+
+    async function postJson(path, payload = {}) {
+      if (!window.BridgeSimulator) throw new Error('Local simulator failed to load');
+      return window.BridgeSimulator.post(path, payload);
+    }
+
+    async function refresh() {
+      state.runs = [];
+      renderList();
+    }
+
+    function renderList() {
+      $('runs').innerHTML = '';
+      if (!state.runs.length) {
+        $('runs').innerHTML = '<div class="subtitle">No training runs yet.</div>';
+        return;
+      }
+      for (const run of state.runs) {
+        const group = document.createElement('details');
+        group.className = 'run-group';
+        group.open = state.selected?.summary.run_id === run.id;
+        const header = document.createElement('summary');
+        header.className = 'run-header';
+        header.innerHTML = `<div class="run-name">${run.name}</div><div class="run-meta">${run.status} · seed ${run.seed ?? '—'} · ${run.rollout_count} iterations</div>`;
+        const iterations = document.createElement('div');
+        iterations.className = 'run-rollouts';
+        renderRunRollouts(run, iterations);
+        group.addEventListener('toggle', () => {
+          if (group.open && !run.rollouts && !run.loading) {
+            loadRunRollouts(run, iterations);
+          }
+        });
+        group.append(header, iterations);
+        $('runs').append(group);
+        if (group.open && !run.rollouts) loadRunRollouts(run, iterations);
+      }
+    }
+
+    function renderRunRollouts(run, container) {
+      container.innerHTML = '';
+      if (!run.rollouts) {
+        container.innerHTML = '<div class="run-meta">Expand to load iterations.</div>';
+        return;
+      }
+      if (!run.rollouts.length) {
+        container.innerHTML = '<div class="run-meta">No rollout traces yet.</div>';
+        return;
+      }
+      for (const item of run.rollouts) {
+        const button = document.createElement('button');
+        button.className = 'rollout' + (state.selected?.summary.path === item.path ? ' active' : '');
+        button.innerHTML = `<div class="rollout-name">${item.name}</div><div class="rollout-meta">
+          <span>${formatBytes(item.bytes)}</span><span>load trace on selection</span></div>`;
+        button.onclick = () => selectRollout(item.path);
+        container.append(button);
+      }
+    }
+
+    async function loadRunRollouts(run, container) {
+      run.rollouts = [];
+      renderRunRollouts(run, container);
+    }
+
+    async function selectRollout() {
+      throw new Error('Recorded rollouts are not part of the static simulator');
+    }
+
+    async function resetSimulator({preserveMouse = false, resume = false} = {}) {
+      stop();
+      stopLiveLoop();
+      stopLiveRenderLoop();
+      clearLiveInput({resetToggle: true, resetClicks: true});
+      if (!preserveMouse) releaseMouseCapture();
+      $('liveStatus').textContent = 'Loading…';
+      $('livePause').disabled = true;
+      try {
+        const session = await postJson('/api/play/reset');
+        state.mode = 'live';
+        state.live.sessionId = session.session_id;
+        state.live.inFlight = false;
+        state.live.done = false;
+        state.live.completed = false;
+        state.selected = {
+          summary: {run_id: 'interactive', name: 'Live simulator'},
+          document: session.document,
+        };
+        state.tickIndex = 0;
+        state.playhead = 0;
+        const initial = session.document.ticks[0];
+        state.live.cameraYaw = initial.yaw;
+        state.live.cameraPitch = initial.pitch;
+        state.live.pendingYaw = 0;
+        state.live.pendingPitch = 0;
+        state.live.fovMultiplier = 1;
+        state.live.bobDistance = 0;
+        state.live.bobYaw = 0;
+        state.live.bobPitch = 0;
+        state.live.lastShiftRightClickTime = -Infinity;
+        state.live.lastPlacementTime = 0;
+        state.live.runStartedAt = null;
+        if (!preserveMouse) {
+          performanceDiagnostics.frameGaps.length = 0;
+          performanceDiagnostics.renderTimes.length = 0;
+          performanceDiagnostics.physicsGaps.length = 0;
+          performanceDiagnostics.stepStartGaps.length = 0;
+          performanceDiagnostics.requestTimes.length = 0;
+          performanceDiagnostics.movementSpeeds.length = 0;
+          for (const samples of [
+            performanceDiagnostics.frameGaps,
+            performanceDiagnostics.renderTimes,
+            performanceDiagnostics.physicsGaps,
+            performanceDiagnostics.stepStartGaps,
+            performanceDiagnostics.requestTimes,
+            performanceDiagnostics.movementSpeeds,
+          ]) performanceSampleSummaries.delete(samples);
+          performanceDiagnostics.movingFrames = 0;
+          performanceDiagnostics.heldMovingFrames = 0;
+          performanceDiagnostics.cappedInterpolationFrames = 0;
+          performanceDiagnostics.lastFrameTime = null;
+          performanceDiagnostics.lastPhysicsTime = null;
+          performanceDiagnostics.lastStepStartTime = null;
+        }
+        state.live.renderPose = {
+          position: [...initial.position], yaw: initial.yaw, pitch: initial.pitch,
+          eyeHeight: initial.eye_height ?? 1.62,
+        };
+        state.live.renderTickFrom = initial;
+        state.live.renderTickTo = initial;
+        state.live.renderTickStartedAt = performance.now();
+        $('replayControls').hidden = true;
+        $('liveControls').hidden = false;
+        $('livePause').disabled = false;
+        $('livePause').textContent = 'Start';
+        $('liveStatus').textContent = 'Ready · click to play';
+        $('title').textContent = 'Play the simulator';
+        $('source').textContent = 'Live Python surrogate · display-refresh rendering · 20 TPS physics';
+        $('frameNote').textContent = 'Physics runs at 20 ticks per second; the first-person view renders at the display refresh rate.';
+        $('ticksMetric').textContent = '0';
+        $('blocksMetric').textContent = '0';
+        $('speedMetric').textContent = '—';
+        renderList();
+        renderTick(0, true);
+        startLiveRenderLoop();
+        $('simFrame').focus();
+        if (diagnosticAutoForward) {
+          state.live.keys.add('KeyW');
+          updateKeybinds();
+          startSimulator();
+        } else if (resume) {
+          startSimulator();
+        }
+      } catch (error) {
+        $('liveStatus').textContent = `Could not start: ${error.message}`;
+      }
+    }
+
+    function stopLiveLoop() {
+      if (state.live.timer) clearTimeout(state.live.timer);
+      state.live.timer = null;
+      state.live.running = false;
+    }
+
+    function stopLiveRenderLoop() {
+      if (state.live.renderFrame) cancelAnimationFrame(state.live.renderFrame);
+      state.live.renderFrame = null;
+    }
+
+    function pauseWhenBrowserLosesFocus() {
+      if (state.mode !== 'live' || !state.live.running || document.hasFocus()) return false;
+      const shiftRightClick = performance.now() - state.live.lastShiftRightClickTime < 1500;
+      if (!shiftRightClick) return false;
+      pauseSimulator('Paused · Firefox reserves Shift + right-click; use F to place while crouched');
+      return true;
+    }
+
+    function startLiveRenderLoop() {
+      stopLiveRenderLoop();
+      state.live.renderLastTime = performance.now();
+      state.live.frameWindowStart = state.live.renderLastTime;
+      state.live.frameCount = 0;
+      const animate = now => {
+        if (state.mode !== 'live' || !state.live.renderPose || !state.selected) return;
+        let renderStartedAt = 0;
+        if (diagnosticsEnabled) {
+          if (performanceDiagnostics.lastFrameTime != null) {
+            recordPerformanceSample(performanceDiagnostics.frameGaps,
+              now - performanceDiagnostics.lastFrameTime);
+          }
+          performanceDiagnostics.lastFrameTime = now;
+          renderStartedAt = performance.now();
+        }
+        if (pauseWhenBrowserLosesFocus()) {
+          state.live.renderFrame = requestAnimationFrame(animate);
+          return;
+        }
+        const elapsed = Math.min(50, now - state.live.renderLastTime);
+        state.live.renderLastTime = now;
+        const ticks = state.selected.document.ticks;
+        const index = ticks.length - 1;
+        const row = ticks[index];
+        // Advance on a stable 20 TPS clock instead of restarting interpolation
+        // whenever a response arrives with a few milliseconds of HTTP jitter.
+        const tickProgress = state.live.running
+          ? Math.max(0, Math.min(2.5,
+            (now - state.live.renderTickStartedAt) / LIVE_TICK_MS))
+          : 1;
+        if (diagnosticsEnabled && state.live.running && tickProgress >= 2.5) {
+          performanceDiagnostics.cappedInterpolationFrames += 1;
+        }
+        const tickFrom = state.live.renderTickFrom ?? row;
+        const tickTo = state.live.renderTickTo ?? row;
+        const previousPosition = [...state.live.renderPose.position];
+        state.live.renderPose.position = tickFrom.position.map((value, axis) =>
+          value + (tickTo.position[axis] - value) * tickProgress);
+        const horizontalDistance = Math.hypot(
+          state.live.renderPose.position[0] - previousPosition[0],
+          state.live.renderPose.position[2] - previousPosition[2]);
+        state.live.bobDistance += horizontalDistance * 0.6;
+        const fovBlend = 1 - Math.pow(0.5, elapsed / 50);
+        const fovTarget = row.sprinting ? 1.15 : 1;
+        state.live.fovMultiplier += (fovTarget - state.live.fovMultiplier) * fovBlend;
+        const grounded = row.on_ground ?? row.pre_on_ground ?? true;
+        const horizontalSpeed = Math.min(0.1, Math.hypot(
+          row.velocity?.[0] ?? 0, row.velocity?.[2] ?? 0));
+        if (diagnosticsEnabled && horizontalSpeed > .005 && elapsed > 0) {
+          performanceDiagnostics.movingFrames += 1;
+          if (horizontalDistance < 1e-7) performanceDiagnostics.heldMovingFrames += 1;
+          recordPerformanceSample(performanceDiagnostics.movementSpeeds,
+            horizontalDistance / elapsed);
+        }
+        const bobYawTarget = grounded ? horizontalSpeed : 0;
+        const bobPitchTarget = grounded ? 0
+          : Math.atan(-(row.velocity?.[1] ?? 0) * 0.2) * 15;
+        const bobYawBlend = 1 - Math.pow(0.6, elapsed / 50);
+        const bobPitchBlend = 1 - Math.pow(0.2, elapsed / 50);
+        state.live.bobYaw += (bobYawTarget - state.live.bobYaw) * bobYawBlend;
+        state.live.bobPitch += (bobPitchTarget - state.live.bobPitch) * bobPitchBlend;
+        const toEyeHeight = tickTo.eye_height ?? 1.62;
+        state.live.renderPose.eyeHeight = toEyeHeight;
+        state.live.renderPose.yaw = state.live.cameraYaw;
+        state.live.renderPose.pitch = state.live.cameraPitch;
+        renderSimulation(ticks, index, 0);
+        if (!document.body.classList.contains('simulator-mode')) {
+          renderThirdPerson(ticks, index, 0);
+        }
+        state.live.frameCount += 1;
+        const windowDuration = now - state.live.frameWindowStart;
+        if (windowDuration >= 500) {
+          state.live.renderFps = Math.round(state.live.frameCount * 1000 / windowDuration);
+          state.live.frameCount = 0;
+          state.live.frameWindowStart = now;
+          $('renderRate').textContent = `render ${state.live.renderFps} FPS · physics 20 TPS`;
+        }
+        $('frameTick').textContent = `render ${state.live.renderFps || '—'} FPS · simulation tick ${row.tick}`;
+        if (diagnosticsEnabled) {
+          recordPerformanceSample(performanceDiagnostics.renderTimes,
+            performance.now() - renderStartedAt);
+          publishPerformanceDiagnostics(now);
+        }
+        state.live.renderFrame = requestAnimationFrame(animate);
+      };
+      state.live.renderFrame = requestAnimationFrame(animate);
+    }
+
+    function clearLiveInput({resetToggle = false, resetClicks = false} = {}) {
+      state.live.keys.clear();
+      state.live.mouseUse = false;
+      state.live.pendingClick = false;
+      if (resetToggle) state.live.sprintToggled = true;
+      if (resetClicks) state.live.clickTimes = {left: [], right: []};
+      updateKeybinds();
+    }
+
+    function recordClick(button, now = performance.now()) {
+      state.live.clickTimes[button].push(now);
+    }
+
+    function currentCps(now = performance.now()) {
+      const cutoff = now - 1000;
+      for (const clicks of Object.values(state.live.clickTimes)) {
+        while (clicks.length && clicks[0] < cutoff) clicks.shift();
+      }
+      return {left: state.live.clickTimes.left.length, right: state.live.clickTimes.right.length};
+    }
+
+    function finishBridgeTimer(now = performance.now()) {
+      if (state.live.runStartedAt == null) return;
+      const elapsed = now - state.live.runStartedAt;
+      state.live.runStartedAt = null;
+      state.live.lastTimeMs = elapsed;
+      state.live.bestTimeMs = state.live.bestTimeMs == null
+        ? elapsed : Math.min(state.live.bestTimeMs, elapsed);
+      saveBridgeTime(BRIDGE_LAST_TIME_KEY, state.live.lastTimeMs);
+      saveBridgeTime(BRIDGE_BEST_TIME_KEY, state.live.bestTimeMs);
+    }
+
+    function pauseSimulator(message = 'Paused') {
+      if (state.mode !== 'live' || state.live.done) return;
+      stopLiveLoop();
+      clearLiveInput();
+      releaseMouseCapture();
+      $('liveStatus').textContent = message;
+      $('livePause').textContent = 'Resume';
+    }
+
+    function startSimulator() {
+      if (state.mode !== 'live' || state.live.running || state.live.done || !state.live.sessionId) return;
+      state.live.running = true;
+      $('liveStatus').textContent = 'Running';
+      $('livePause').textContent = 'Pause';
+      scheduleLiveStep(0);
+    }
+
+    function scheduleLiveStep(delay) {
+      if (!state.live.running || state.live.done) return;
+      state.live.timer = setTimeout(stepSimulator, delay);
+    }
+
+    function liveAction() {
+      const keys = state.live.keys;
+      const axis = (positive, negative) => Number(keys.has(positive)) - Number(keys.has(negative));
+      const degrees4 = 4 * Math.PI / 180;
+      const maxDelta = 36 * Math.PI / 180;
+      const keyboardYaw = axis('ArrowRight', 'ArrowLeft') * degrees4;
+      const requestedPitch = axis('ArrowDown', 'ArrowUp') * degrees4;
+      state.live.cameraYaw += keyboardYaw;
+      state.live.pendingYaw += keyboardYaw;
+      const nextPitch = Math.max(-Math.PI / 2, Math.min(
+        Math.PI / 2, state.live.cameraPitch + requestedPitch));
+      state.live.pendingPitch += nextPitch - state.live.cameraPitch;
+      state.live.cameraPitch = nextPitch;
+      const yawDelta = Math.max(-maxDelta, Math.min(maxDelta, state.live.pendingYaw));
+      const pitchDelta = Math.max(-maxDelta, Math.min(maxDelta, state.live.pendingPitch));
+      state.live.pendingYaw -= yawDelta;
+      state.live.pendingPitch -= pitchDelta;
+      const action = {
+        forward: axis('KeyW', 'KeyS'),
+        strafe: axis('KeyA', 'KeyD'),
+        yaw_delta: yawDelta,
+        pitch_delta: pitchDelta,
+        jump: keys.has('Space'),
+        sprint: state.live.sprintToggled,
+        sneak: keys.has('ShiftLeft') || keys.has('ShiftRight'),
+        use: state.live.mouseUse,
+        use_click: state.live.pendingClick,
+      };
+      state.live.pendingClick = false;
+      return action;
+    }
+
+    function applyMouseLook(movementX, movementY) {
+      const sensitivity = 0.12 * Math.PI / 180;
+      const yawDelta = movementX * sensitivity;
+      const requestedPitch = movementY * sensitivity;
+      state.live.cameraYaw += yawDelta;
+      state.live.pendingYaw += yawDelta;
+      const nextPitch = Math.max(-Math.PI / 2, Math.min(
+        Math.PI / 2, state.live.cameraPitch + requestedPitch));
+      state.live.pendingPitch += nextPitch - state.live.cameraPitch;
+      state.live.cameraPitch = nextPitch;
+    }
+
+    function focusSimulatorInput() {
+      if (state.mode !== 'live') return;
+      try {
+        $('simFrame').focus({preventScroll: true});
+      } catch (_) {
+        $('simFrame').focus();
+      }
+    }
+
+    function captureMouse() {
+      if (state.mode !== 'live') return;
+      focusSimulatorInput();
+      if (document.pointerLockElement !== $('simFrame')) {
+        if ($('simFrame').requestPointerLock) {
+          try {
+            const request = $('simFrame').requestPointerLock();
+            request?.catch(enableFallbackMouse);
+          } catch (_) {
+            enableFallbackMouse();
+          }
+        } else {
+          enableFallbackMouse();
+        }
+      }
+      startSimulator();
+    }
+
+    function enableFallbackMouse() {
+      state.live.mouseFallback = true;
+      document.body.classList.add('mouse-captured');
+      $('captureMouse').textContent = 'Mouse active';
+    }
+
+    function releaseMouseCapture() {
+      state.live.mouseFallback = false;
+      if (document.pointerLockElement === $('simFrame')) document.exitPointerLock?.();
+      document.body.classList.remove('mouse-captured');
+      $('captureMouse').textContent = 'Capture mouse';
+    }
+
+    async function enterSimulatorExperience() {
+      document.body.classList.add('simulator-mode');
+      await resetSimulator();
+    }
+
+    async function exitSimulatorExperience() {
+      pauseSimulator();
+      releaseMouseCapture();
+      document.body.classList.remove('simulator-mode', 'mouse-captured');
+      renderTick(0, true);
+    }
+
+    async function stepSimulator() {
+      if (!state.live.running || state.live.inFlight) return;
+      const started = performance.now();
+      if (diagnosticsEnabled) {
+        if (performanceDiagnostics.lastStepStartTime != null) {
+          recordPerformanceSample(performanceDiagnostics.stepStartGaps,
+            started - performanceDiagnostics.lastStepStartTime);
+        }
+        performanceDiagnostics.lastStepStartTime = started;
+      }
+      const sessionId = state.live.sessionId;
+      state.live.inFlight = true;
+      try {
+        const result = await postJson('/api/play/step', {
+          session_id: sessionId,
+          action: liveAction(),
+        });
+        if (diagnosticsEnabled) {
+          const physicsArrivedAt = performance.now();
+          recordPerformanceSample(performanceDiagnostics.requestTimes,
+            physicsArrivedAt - started);
+          if (performanceDiagnostics.lastPhysicsTime != null) {
+            recordPerformanceSample(performanceDiagnostics.physicsGaps,
+              physicsArrivedAt - performanceDiagnostics.lastPhysicsTime);
+          }
+          performanceDiagnostics.lastPhysicsTime = physicsArrivedAt;
+        }
+        if (state.mode !== 'live' || state.live.sessionId !== sessionId) return;
+        const previousTick = state.selected.document.ticks.at(-1);
+        state.live.renderTickFrom = previousTick;
+        state.live.renderTickTo = result.tick;
+        state.live.renderTickStartedAt = started;
+        state.selected.document.ticks.push(result.tick);
+        if (result.tick.placed) {
+          const placementTime = performance.now();
+          state.live.lastPlacementTime = placementTime;
+          if (state.live.runStartedAt == null) state.live.runStartedAt = placementTime;
+          playBlockPlaceSound();
+        }
+        state.tickIndex = state.selected.document.ticks.length - 1;
+        state.playhead = state.tickIndex;
+        $('ticksMetric').textContent = result.tick.tick;
+        $('blocksMetric').textContent = result.blocks_used;
+        $('speedMetric').textContent = result.tick.tick
+          ? format(result.blocks_used * 20 / result.tick.tick, 2) : '—';
+        renderTick(0, true);
+        if (result.success && !state.live.completed) {
+          state.live.completed = true;
+          finishBridgeTimer();
+          playFinishSound();
+          $('liveStatus').textContent = 'Course complete · jump into the void to restart';
+        }
+        if (result.done) {
+          if (!result.success && result.tick.position[1] < -3) {
+            await resetSimulator({preserveMouse: true, resume: true});
+            return;
+          }
+          state.live.done = true;
+          stopLiveLoop();
+          clearLiveInput();
+          $('liveStatus').textContent = 'Run ended · reset to retry';
+          $('livePause').textContent = 'Finished';
+          $('livePause').disabled = true;
+          return;
+        }
+        scheduleLiveStep(Math.max(0, LIVE_TICK_MS - (performance.now() - started)));
+      } catch (error) {
+        if (state.mode !== 'live' || state.live.sessionId !== sessionId) return;
+        stopLiveLoop();
+        clearLiveInput();
+        $('liveStatus').textContent = `Paused · ${error.message}`;
+        $('livePause').textContent = 'Resume';
+      } finally {
+        if (state.live.sessionId === sessionId) state.live.inFlight = false;
+      }
+    }
+
+    function updateKeybinds() {
+      for (const item of document.querySelectorAll('.keybind')) {
+        const active = item.dataset.codes.split(' ').some(code =>
+          code === 'MouseRight' ? state.live.mouseUse
+          : code === 'KeyF' ? state.live.pendingClick
+          : code.startsWith('Control') ? state.live.sprintToggled
+          : state.live.keys.has(code));
+        item.classList.toggle('on', active);
+      }
+    }
+
+    function renderTick(interpolation = 0, updateTelemetry = true) {
+      if (!state.selected) return;
+      const ticks = state.selected.document.ticks;
+      const row = ticks[state.tickIndex];
+      if (!row) return;
+      const tick = row.tick;
+      const immersive = state.mode === 'live'
+        && document.body.classList.contains('simulator-mode');
+      if (updateTelemetry) {
+        $('timeline').value = state.tickIndex + 1;
+        $('tick').textContent = state.mode === 'live' ? `tick ${tick}` : `tick ${tick} / ${ticks.length}`;
+        $('position').textContent = row.position.map(v => format(v)).join(', ');
+        $('velocity').textContent = row.velocity.map(v => format(v)).join(', ');
+        $('view').textContent = `${format(deg(row.yaw), 1)}° / ${format(deg(row.pitch), 1)}°`;
+        $('reward').textContent = row.reward == null ? 'not recorded' : format(row.reward, 5);
+        $('grounded').textContent = row.pre_on_ground == null ? 'not recorded' : row.pre_on_ground ? 'yes' : 'no';
+        $('placed').textContent = row.placed ? row.placed.join(', ') : '—';
+        if (!immersive) {
+          renderActions(row);
+          renderMap(ticks, state.tickIndex);
+          renderActorFrame(state.tickIndex);
+        }
+      }
+      if (state.mode !== 'live' || !state.live.renderFrame) {
+        renderSimulation(ticks, state.tickIndex, interpolation);
+        if (!immersive) renderThirdPerson(ticks, state.tickIndex, interpolation);
+      }
+      const sneaking = Boolean(row.action?.sneak);
+      $('shiftIndicator').classList.toggle('on', sneaking);
+      $('shiftIndicator').textContent = sneaking ? 'SHIFT · SNEAKING' : 'SHIFT · released';
+      $('frameTick').textContent = `simulation tick ${(tick + interpolation).toFixed(2)}`;
+    }
+
+    async function renderActorFrame() {
+      const canvas = $('actorFrame'), ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      $('actorFrameTick').textContent = 'static simulator';
+    }
+
+    function renderActions(row) {
+      const action = row.action;
+      const entries = [
+        ['forward', action.forward], ['strafe', action.strafe],
+        ['jump', action.jump], ['sprint', action.sprint], ['sneak', action.sneak],
+        ['held use', action.use], ['click', action.use_click],
+        ['yaw Δ', `${format(deg(action.yaw_delta), 1)}°`, 'camera'],
+        ['pitch Δ', `${format(deg(action.pitch_delta), 1)}°`, 'camera'],
+      ];
+      $('actions').innerHTML = entries.map(([name, value, type]) =>
+        `<span class="action ${type || (value && value !== 0 ? 'on' : '')}">${name}: ${value}</span>`).join('')
+        + (row.placed ? `<span class="action place">placed ${row.placed.join(', ')}</span>` : '');
+    }
+
+    const worldSnapshotCache = new WeakMap();
+
+    function visibleWorldSnapshot(ticks, index) {
+      const document = state.selected.document;
+      let snapshot = worldSnapshotCache.get(document);
+      if (!snapshot || snapshot.ticks !== ticks || index < snapshot.index) {
+        const gap = document.benchmark?.gap_blocks;
+        const platformLength = document.benchmark?.platform_size?.[1] ?? 3;
+        const destinationStart = Number.isFinite(gap) ? platformLength + gap : Infinity;
+        const blocks = (document.initial_blocks || [[0, 0, 0]]).map(block => ({
+          position: block,
+          material: block[2] >= destinationStart ? 'gold' : 'quartz',
+        }));
+        snapshot = {
+          ticks, index: -1, blocks,
+          occupied: new Set(blocks.map(block => block.position.join(','))),
+          placementCount: 0,
+        };
+        worldSnapshotCache.set(document, snapshot);
+      }
+      for (let tick = snapshot.index + 1; tick <= index; tick++) {
+        const placed = ticks[tick]?.placed;
+        if (!placed) continue;
+        snapshot.placementCount += 1;
+        const key = placed.join(',');
+        if (snapshot.occupied.has(key)) continue;
+        snapshot.occupied.add(key);
+        snapshot.blocks.push({position: placed, material: 'quartz'});
+      }
+      snapshot.index = index;
+      return snapshot;
+    }
+
+    function visibleWorldBlocks(ticks, index) {
+      return visibleWorldSnapshot(ticks, index).blocks;
+    }
+
+    const BLOCK_FACE_SPECS = [
+      {neighbor:[0,1,0], normal:[0,1,0], corners:[[0,1,0],[1,1,0],[1,1,1],[0,1,1]], shade:1.00},
+      {neighbor:[0,-1,0], normal:[0,-1,0], corners:[[0,0,1],[1,0,1],[1,0,0],[0,0,0]], shade:.45},
+      {neighbor:[0,0,-1], normal:[0,0,-1], corners:[[0,0,0],[1,0,0],[1,1,0],[0,1,0]], shade:.72},
+      {neighbor:[0,0,1], normal:[0,0,1], corners:[[1,0,1],[0,0,1],[0,1,1],[1,1,1]], shade:.82},
+      {neighbor:[-1,0,0], normal:[-1,0,0], corners:[[0,0,1],[0,0,0],[0,1,0],[0,1,1]], shade:.65},
+      {neighbor:[1,0,0], normal:[1,0,0], corners:[[1,0,0],[1,0,1],[1,1,1],[1,1,0]], shade:.76},
+    ];
+
+    function blockFaceTexture(material, spec) {
+      if (material === 'gold') return sunmetalTexture;
+      if (material === 'stone') return aggregateTexture;
+      if (spec.neighbor[1] > 0) return ceramicTopTexture;
+      if (spec.neighbor[1] < 0) return ceramicBottomTexture;
+      return ceramicSideTexture;
+    }
+
+    function blockFaceTextureIndex(material, spec) {
+      if (material === 'stone') return 0;
+      if (material === 'gold') return 1;
+      if (spec.neighbor[1] > 0) return 3;
+      if (spec.neighbor[1] < 0) return 4;
+      return 2;
+    }
+
+    function visibleBlockFaces(blocks, eye) {
+      const occupied = new Set(blocks.map(block => block.position.join(',')));
+      const faces = [];
+      for (const block of blocks) {
+        const [bx, by, bz] = block.position;
+        for (const spec of BLOCK_FACE_SPECS) {
+          const adjacent = block.position.map((value, axis) => value + spec.neighbor[axis]);
+          if (occupied.has(adjacent.join(','))) continue;
+          const center = [bx + .5 + spec.normal[0] * .5,
+                          by + .5 + spec.normal[1] * .5,
+                          bz + .5 + spec.normal[2] * .5];
+          const facing = spec.normal.reduce(
+            (sum, normal, axis) => sum + normal * (eye[axis] - center[axis]), 0);
+          if (facing <= 0) continue;
+          faces.push({block, spec});
+        }
+      }
+      return faces;
+    }
+
+    function targetedBlock(blocks, origin, direction, reach = 4.5) {
+      let target = null, targetDistance = reach;
+      for (const block of blocks) {
+        let entry = 0, exit = targetDistance;
+        for (let axis = 0; axis < 3; axis++) {
+          const minimum = block.position[axis], maximum = minimum + 1;
+          if (Math.abs(direction[axis]) < 1e-8) {
+            if (origin[axis] < minimum || origin[axis] > maximum) entry = Infinity;
+            continue;
+          }
+          const first = (minimum - origin[axis]) / direction[axis];
+          const second = (maximum - origin[axis]) / direction[axis];
+          entry = Math.max(entry, Math.min(first, second));
+          exit = Math.min(exit, Math.max(first, second));
+        }
+        if (entry <= exit && entry < targetDistance) {
+          target = block;
+          targetDistance = entry;
+        }
+      }
+      return target;
+    }
+
+    function selectedBlockOutlineVertices(block, cameraPoint) {
+      if (!block) return [];
+      const epsilon = .002;
+      const [x, y, z] = block.position;
+      const corners = [
+        [x-epsilon,y-epsilon,z-epsilon], [x+1+epsilon,y-epsilon,z-epsilon],
+        [x+1+epsilon,y+1+epsilon,z-epsilon], [x-epsilon,y+1+epsilon,z-epsilon],
+        [x-epsilon,y-epsilon,z+1+epsilon], [x+1+epsilon,y-epsilon,z+1+epsilon],
+        [x+1+epsilon,y+1+epsilon,z+1+epsilon], [x-epsilon,y+1+epsilon,z+1+epsilon],
+      ].map(cameraPoint);
+      const edges = [0,1,1,2,2,3,3,0,4,5,5,6,6,7,7,4,0,4,1,5,2,6,3,7];
+      const vertices = [];
+      for (const corner of edges) {
+        const point = corners[corner];
+        vertices.push(point.x, point.y, point.z, 0, 0, 0);
+      }
+      return vertices;
+    }
+
+    function viewmodelSwingProgress(ticks, index, alpha) {
+      if (state.mode === 'live') {
+        if (!state.live.lastPlacementTime) return 0;
+        const progress = (performance.now() - state.live.lastPlacementTime) / 260;
+        return progress < 1 ? Math.max(0, progress) : 0;
+      }
+      let placementIndex = -1;
+      for (let tick = index; tick >= Math.max(0, index - 4); tick--) {
+        if (ticks[tick].placed) { placementIndex = tick; break; }
+      }
+      if (placementIndex < 0) return 0;
+      return Math.min(1, (index - placementIndex + alpha + .2) / 4);
+    }
+
+    function rotateViewmodelX([x, y, z], radians) {
+      const sine = Math.sin(radians), cosine = Math.cos(radians);
+      return [x, y * cosine - z * sine, y * sine + z * cosine];
+    }
+
+    function rotateViewmodelY([x, y, z], radians) {
+      const sine = Math.sin(radians), cosine = Math.cos(radians);
+      return [x * cosine + z * sine, y, -x * sine + z * cosine];
+    }
+
+    function rotateViewmodelZ([x, y, z], radians) {
+      const sine = Math.sin(radians), cosine = Math.cos(radians);
+      return [x * cosine - y * sine, x * sine + y * cosine, z];
+    }
+
+    function transformHeldItemPoint(point, swingProgress, isNormal = false) {
+      const squaredSwing = Math.sin(swingProgress * swingProgress * Math.PI);
+      const rootSwing = Math.sin(Math.sqrt(swingProgress) * Math.PI);
+      // Vanilla's 0.4 first-person scale is followed by a 2x 3D-item scale
+      // and RenderItem's universal 0.5 model scale, leaving 0.4 overall.
+      let transformed = isNormal ? [...point] : point.map(value => value * .4);
+      transformed = rotateViewmodelX(transformed, rootSwing * -80 * Math.PI / 180);
+      transformed = rotateViewmodelZ(transformed, rootSwing * -20 * Math.PI / 180);
+      transformed = rotateViewmodelY(transformed, squaredSwing * -20 * Math.PI / 180);
+      transformed = rotateViewmodelY(transformed, Math.PI / 4);
+      if (isNormal) return transformed;
+      const usedX = -.4 * Math.sin(Math.sqrt(swingProgress) * Math.PI);
+      const usedY = .2 * Math.sin(Math.sqrt(swingProgress) * Math.PI * 2);
+      const usedZ = -.2 * Math.sin(swingProgress * Math.PI);
+      return [transformed[0] + .56 + usedX,
+              transformed[1] - .52 + usedY,
+              transformed[2] - .72 + usedZ];
+    }
+
+    function drawTexturedBlockFace(ctx, points, project, pixels, shade) {
+      const interpolate = (u, v) => points[0].map((_, axis) =>
+        points[0][axis] * (1 - u) * (1 - v)
+        + points[1][axis] * u * (1 - v)
+        + points[2][axis] * u * v
+        + points[3][axis] * (1 - u) * v);
+      const outline = points.map(project);
+      ctx.save(); ctx.beginPath(); ctx.moveTo(...outline[0]);
+      for (const point of outline.slice(1)) ctx.lineTo(...point);
+      ctx.closePath(); ctx.clip();
+      for (let row = 0; row < 16; row++) {
+        for (let column = 0; column < 16; column++) {
+          const u0 = column / 16, u1 = (column + 1) / 16;
+          const v0 = row / 16, v1 = (row + 1) / 16;
+          const projected = [interpolate(u0, v0), interpolate(u1, v0),
+                             interpolate(u1, v1), interpolate(u0, v1)].map(project);
+          const center = projected.reduce((sum, point) =>
+            [sum[0] + point[0] / 4, sum[1] + point[1] / 4], [0, 0]);
+          const corners = projected.map(point => {
+            const offsetX = point[0] - center[0], offsetY = point[1] - center[1];
+            const length = Math.hypot(offsetX, offsetY) || 1;
+            return [point[0] + offsetX / length * .55,
+                    point[1] + offsetY / length * .55];
+          });
+          const pixel = (row * 16 + column) * 4;
+          ctx.fillStyle = `rgba(${Math.round(pixels[pixel] * shade)},`
+            + `${Math.round(pixels[pixel + 1] * shade)},`
+            + `${Math.round(pixels[pixel + 2] * shade)},${pixels[pixel + 3] / 255})`;
+          ctx.beginPath(); ctx.moveTo(...corners[0]);
+          for (const corner of corners.slice(1)) ctx.lineTo(...corner);
+          ctx.closePath(); ctx.fill();
+        }
+      }
+      ctx.restore();
+    }
+
+    function projectedFaceOnScreen(points, canvas) {
+      const x = points.map(point => point[0]);
+      const y = points.map(point => point[1]);
+      return Math.max(...x) >= -1 && Math.min(...x) <= canvas.width + 1
+        && Math.max(...y) >= -1 && Math.min(...y) <= canvas.height + 1;
+    }
+
+    function createWorldWebGlRenderer() {
+      const canvas = document.createElement('canvas');
+      const gl = canvas.getContext('webgl', {alpha:true, antialias:false});
+      if (!gl) return null;
+      const compile = (type, source) => {
+        const shader = gl.createShader(type);
+        gl.shaderSource(shader, source); gl.compileShader(shader);
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) return null;
+        return shader;
+      };
+      const vertexShader = compile(gl.VERTEX_SHADER, `
+        attribute vec3 a_position;
+        attribute vec2 a_uv;
+        attribute float a_shade;
+        uniform vec2 u_projection;
+        uniform vec2 u_depth;
+        varying vec2 v_uv;
+        varying float v_shade;
+        void main() {
+          float z = a_position.z;
+          gl_Position = vec4(a_position.x * u_projection.x,
+            a_position.y * u_projection.y, u_depth.x * z + u_depth.y, z);
+          v_uv = a_uv;
+          v_shade = a_shade;
+        }
+      `);
+      const fragmentShader = compile(gl.FRAGMENT_SHADER, `
+        precision mediump float;
+        uniform sampler2D u_atlas;
+        uniform float u_alpha;
+        varying vec2 v_uv;
+        varying float v_shade;
+        void main() {
+          vec4 color = texture2D(u_atlas, v_uv);
+          gl_FragColor = vec4(color.rgb * v_shade, color.a * u_alpha);
+        }
+      `);
+      if (!vertexShader || !fragmentShader) return null;
+      const program = gl.createProgram();
+      gl.attachShader(program, vertexShader); gl.attachShader(program, fragmentShader);
+      gl.linkProgram(program);
+      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) return null;
+      const renderer = {
+        canvas, gl, program, buffer: gl.createBuffer(), texture: gl.createTexture(),
+        atlasReady: false,
+        position: gl.getAttribLocation(program, 'a_position'),
+        uv: gl.getAttribLocation(program, 'a_uv'),
+        shade: gl.getAttribLocation(program, 'a_shade'),
+        projection: gl.getUniformLocation(program, 'u_projection'),
+        depth: gl.getUniformLocation(program, 'u_depth'),
+        alpha: gl.getUniformLocation(program, 'u_alpha'),
+      };
+      return renderer;
+    }
+
+    function uploadWorldTextureAtlas(renderer) {
+      if (renderer.atlasReady) return true;
+      if (worldBlockTextures.some(texture => !texture.image.width)) return false;
+      const atlas = document.createElement('canvas');
+      atlas.width = worldBlockTextures.length * 16; atlas.height = 16;
+      const context = atlas.getContext('2d');
+      context.imageSmoothingEnabled = false;
+      worldBlockTextures.forEach((texture, index) =>
+        context.drawImage(texture.image, index * 16, 0, 16, 16));
+      const {gl} = renderer;
+      gl.bindTexture(gl.TEXTURE_2D, renderer.texture);
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, atlas);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      renderer.atlasReady = true;
+      return true;
+    }
+
+    function renderTexturedWorldWebGl(blocks, eye, cameraPoint, focal, targetCanvas, selectedBlock) {
+      if (!worldWebGlRenderer) worldWebGlRenderer = createWorldWebGlRenderer();
+      const renderer = worldWebGlRenderer;
+      if (!renderer || !uploadWorldTextureAtlas(renderer)) return false;
+      const vertices = [];
+      const atlasWidth = worldBlockTextures.length * 16;
+      const triangleCorners = [0,1,2,0,2,3];
+      for (const {block, spec} of visibleBlockFaces(blocks, eye)) {
+        const [bx, by, bz] = block.position;
+        const points = spec.corners.map(([x,y,z]) => cameraPoint([bx+x, by+y, bz+z]));
+        const textureIndex = blockFaceTextureIndex(block.material, spec);
+        const u0 = (textureIndex * 16 + .01) / atlasWidth;
+        const u1 = ((textureIndex + 1) * 16 - .01) / atlasWidth;
+        const uv = [[u0,0],[u1,0],[u1,1],[u0,1]];
+        for (const corner of triangleCorners) {
+          const point = points[corner], texturePoint = uv[corner];
+          vertices.push(point.x, point.y, point.z,
+            texturePoint[0], texturePoint[1], spec.shade);
+        }
+      }
+      const {canvas, gl} = renderer;
+      if (canvas.width !== targetCanvas.width || canvas.height !== targetCanvas.height) {
+        canvas.width = targetCanvas.width; canvas.height = targetCanvas.height;
+      }
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.clearColor(0, 0, 0, 0); gl.clearDepth(1);
+      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+      if (!vertices.length) return true;
+      gl.useProgram(renderer.program);
+      gl.bindBuffer(gl.ARRAY_BUFFER, renderer.buffer);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.DYNAMIC_DRAW);
+      const stride = 6 * Float32Array.BYTES_PER_ELEMENT;
+      gl.enableVertexAttribArray(renderer.position);
+      gl.vertexAttribPointer(renderer.position, 3, gl.FLOAT, false, stride, 0);
+      gl.enableVertexAttribArray(renderer.uv);
+      gl.vertexAttribPointer(renderer.uv, 2, gl.FLOAT, false, stride, 3 * 4);
+      gl.enableVertexAttribArray(renderer.shade);
+      gl.vertexAttribPointer(renderer.shade, 1, gl.FLOAT, false, stride, 5 * 4);
+      gl.uniform2f(renderer.projection,
+        2 * focal / canvas.width, 2 * focal / canvas.height);
+      const near = .04, far = 50;
+      gl.uniform2f(renderer.depth,
+        (far + near) / (far - near), -2 * far * near / (far - near));
+      gl.uniform1f(renderer.alpha, 1);
+      gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, renderer.texture);
+      gl.enable(gl.DEPTH_TEST); gl.depthFunc(gl.LEQUAL);
+      gl.disable(gl.BLEND); gl.disable(gl.CULL_FACE);
+      gl.drawArrays(gl.TRIANGLES, 0, vertices.length / 6);
+      const outline = selectedBlockOutlineVertices(selectedBlock, cameraPoint);
+      if (outline.length) {
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(outline), gl.DYNAMIC_DRAW);
+        gl.uniform1f(renderer.alpha, .55);
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        gl.depthMask(false);
+        gl.lineWidth(2);
+        gl.drawArrays(gl.LINES, 0, outline.length / 6);
+        gl.depthMask(true);
+        gl.disable(gl.BLEND);
+      }
+      return true;
+    }
+
+    function drawTexturedWorldFace(ctx, points, texture, shade) {
+      const sourceImage = texture.renderSource || texture.image;
+      if (!sourceImage.width || points.length !== 4) return false;
+      const x = points.map(point => point[0]);
+      const y = points.map(point => point[1]);
+      if ((Math.max(...x) - Math.min(...x)) * (Math.max(...y) - Math.min(...y)) < 48) {
+        return false;
+      }
+      const triangles = [
+        {target:[points[0],points[1],points[2]], transform:[
+          (points[1][0] - points[0][0]) / 16, (points[1][1] - points[0][1]) / 16,
+          (points[2][0] - points[1][0]) / 16, (points[2][1] - points[1][1]) / 16,
+          points[0][0], points[0][1],
+        ]},
+        {target:[points[0],points[2],points[3]], transform:[
+          (points[2][0] - points[3][0]) / 16, (points[2][1] - points[3][1]) / 16,
+          (points[3][0] - points[0][0]) / 16, (points[3][1] - points[0][1]) / 16,
+          points[0][0], points[0][1],
+        ]},
+      ];
+      ctx.save();
+      ctx.beginPath(); ctx.moveTo(...points[0]);
+      for (const point of points.slice(1)) ctx.lineTo(...point);
+      ctx.closePath(); ctx.clip();
+      ctx.imageSmoothingEnabled = false;
+      for (const {target, transform} of triangles) {
+        const center = target.reduce((sum, point) =>
+          [sum[0] + point[0] / 3, sum[1] + point[1] / 3], [0, 0]);
+        const expanded = target.map(point => {
+          const length = Math.hypot(point[0] - center[0], point[1] - center[1]) || 1;
+          return [point[0] + (point[0] - center[0]) / length * .65,
+                  point[1] + (point[1] - center[1]) / length * .65];
+        });
+        ctx.save();
+        ctx.beginPath(); ctx.moveTo(...expanded[0]);
+        ctx.lineTo(...expanded[1]); ctx.lineTo(...expanded[2]); ctx.closePath(); ctx.clip();
+        ctx.transform(...transform);
+        ctx.drawImage(sourceImage, 0, 0, 16, 16);
+        ctx.restore();
+      }
+      if (shade < 1) {
+        ctx.fillStyle = `rgba(0,0,0,${1 - shade})`;
+        ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      }
+      ctx.restore();
+      return true;
+    }
+
+    const HELD_BLOCK_VERTICES = [
+      [-.5,-.5,-.5], [.5,-.5,-.5], [.5,.5,-.5], [-.5,.5,-.5],
+      [-.5,-.5,.5], [.5,-.5,.5], [.5,.5,.5], [-.5,.5,.5],
+    ];
+    const HELD_BLOCK_FACES = [
+      {vertices:[4,5,6,7], normal:[0,0,1], shade:.80, texture:ceramicSideTexture},
+      {vertices:[1,0,3,2], normal:[0,0,-1], shade:.80, texture:ceramicSideTexture},
+      {vertices:[0,4,7,3], normal:[-1,0,0], shade:.62, texture:ceramicSideTexture},
+      {vertices:[5,1,2,6], normal:[1,0,0], shade:.68, texture:ceramicSideTexture},
+      {vertices:[7,6,2,3], normal:[0,1,0], shade:1.00, texture:ceramicTopTexture},
+      {vertices:[0,1,5,4], normal:[0,-1,0], shade:.50, texture:ceramicBottomTexture},
+    ];
+
+    function cachedHeldQuartzFrame(canvas, swing) {
+      const swingFrame = Math.round(swing * HELD_ITEM_SWING_FRAMES);
+      const key = `${canvas.width}x${canvas.height}:${swingFrame}`;
+      if (heldItemFrameCache.has(key)) return heldItemFrameCache.get(key);
+      const sampledSwing = swingFrame / HELD_ITEM_SWING_FRAMES;
+      const vertices = HELD_BLOCK_VERTICES.map(point =>
+        transformHeldItemPoint(point, sampledSwing));
+      const focal = canvas.height / (2 * Math.tan(70 * Math.PI / 360));
+      const project = ([x, y, z]) => [canvas.width / 2 + x / -z * focal,
+                                      canvas.height / 2 - y / -z * focal];
+      const faces = [];
+      for (const face of HELD_BLOCK_FACES) {
+        const points3d = face.vertices.map(vertex => vertices[vertex]);
+        const center = points3d.reduce((sum, point) => sum.map(
+          (value, axis) => value + point[axis] / points3d.length), [0,0,0]);
+        const normal = transformHeldItemPoint(face.normal, sampledSwing, true);
+        if (normal[0] * -center[0] + normal[1] * -center[1] + normal[2] * -center[2] <= 0) continue;
+        if (points3d.some(point => point[2] >= -.05)) continue;
+        faces.push({points3d, points: points3d.map(project), depth: -center[2],
+                    shade: face.shade, texture: face.texture});
+      }
+      if (!faces.length) {
+        heldItemFrameCache.set(key, null);
+        return null;
+      }
+      faces.sort((left, right) => right.depth - left.depth);
+      const facePoints = faces.flatMap(face => face.points);
+      const frameX = Math.max(0, Math.floor(Math.min(...facePoints.map(point => point[0])) - 1));
+      const frameY = Math.max(0, Math.floor(Math.min(...facePoints.map(point => point[1])) - 1));
+      const frameRight = Math.min(canvas.width,
+        Math.ceil(Math.max(...facePoints.map(point => point[0])) + 1));
+      const frameBottom = Math.min(canvas.height,
+        Math.ceil(Math.max(...facePoints.map(point => point[1])) + 1));
+      const frameCanvas = document.createElement('canvas');
+      frameCanvas.width = Math.max(1, frameRight - frameX);
+      frameCanvas.height = Math.max(1, frameBottom - frameY);
+      const frameContext = frameCanvas.getContext('2d');
+      frameContext.translate(-frameX, -frameY);
+      for (const face of faces) {
+        if (face.texture.pixels) {
+          drawTexturedBlockFace(frameContext, face.points3d, project,
+            face.texture.pixels, face.shade);
+        } else {
+          frameContext.beginPath(); frameContext.moveTo(...face.points[0]);
+          for (const point of face.points.slice(1)) frameContext.lineTo(...point);
+          frameContext.closePath(); frameContext.fillStyle = '#dddcd2'; frameContext.fill();
+        }
+      }
+      const frame = {canvas: frameCanvas, x: frameX, y: frameY};
+      heldItemFrameCache.set(key, frame);
+      return frame;
+    }
+
+    function renderFirstPersonHeldQuartz(ctx, canvas, ticks, index, alpha, inventory) {
+      if (inventory <= 0) return;
+      const frame = cachedHeldQuartzFrame(canvas,
+        viewmodelSwingProgress(ticks, index, alpha));
+      if (frame) ctx.drawImage(frame.canvas, frame.x, frame.y);
+    }
+
+    function hudTextWidth(text, scale) {
+      return [...text].length * 7 * scale;
+    }
+
+    function drawHudText(ctx, text, x, y, scale = 3) {
+      ctx.save();
+      ctx.font = `600 ${7 * scale}px ui-monospace, SFMono-Regular, Menlo, monospace`;
+      ctx.textBaseline = 'top';
+      ctx.lineJoin = 'round';
+      ctx.lineWidth = Math.max(2, scale * 1.35);
+      ctx.strokeStyle = 'rgba(9, 17, 23, .78)';
+      ctx.strokeText(text, x, y);
+      ctx.fillStyle = '#eef7f5';
+      ctx.fillText(text, x, y);
+      ctx.restore();
+    }
+
+    function formatBridgeTime(milliseconds) {
+      return milliseconds == null ? '--' : `${(milliseconds / 1000).toFixed(3)}s`;
+    }
+
+    function renderGameHud(ctx, canvas) {
+      if (state.mode !== 'live') return;
+      let y = 18;
+      drawHudText(ctx, `${state.live.renderFps || 0} FPS`, 18, y, 2);
+      y += 20;
+      if (state.live.sprintToggled) {
+        drawHudText(ctx, 'SPRINT  ON', 18, y, 2);
+        y += 20;
+      }
+      const {left, right} = currentCps();
+      drawHudText(ctx, `${left} / ${right} CPS`, 18, y, 2);
+      const timingLines = [];
+      if (state.live.runStartedAt != null) {
+        timingLines.push(`TIME  ${formatBridgeTime(performance.now() - state.live.runStartedAt)}`);
+      }
+      timingLines.push(`LAST  ${formatBridgeTime(state.live.lastTimeMs)}`);
+      timingLines.push(`BEST  ${formatBridgeTime(state.live.bestTimeMs)}`);
+      let timingY = canvas.height - 18 - (timingLines.length - 1) * 20;
+      for (const line of timingLines) {
+        drawHudText(ctx, line, canvas.width - 18 - hudTextWidth(line, 2), timingY, 2);
+        timingY += 20;
+      }
+    }
+
+    function cachedHotbarBlockIcon() {
+      if (hotbarBlockIconCache) return hotbarBlockIconCache;
+      const canvas = document.createElement('canvas');
+      canvas.width = 32; canvas.height = 32;
+      const context = canvas.getContext('2d');
+      const project = point => point;
+      const faces = [
+        {points:[[16,1],[30,8],[16,15],[2,8]], texture:ceramicTopTexture, shade:1, fallback:'#eee9df'},
+        {points:[[2,8],[16,15],[16,31],[2,24]], texture:ceramicSideTexture, shade:.68, fallback:'#aaa59c'},
+        {points:[[16,15],[30,8],[30,24],[16,31]], texture:ceramicSideTexture, shade:.82, fallback:'#d1cbc0'},
+      ];
+      for (const face of faces) {
+        if (face.texture.pixels) {
+          drawTexturedBlockFace(context, face.points, project, face.texture.pixels, face.shade);
+        } else {
+          context.beginPath(); context.moveTo(...face.points[0]);
+          for (const point of face.points.slice(1)) context.lineTo(...point);
+          context.closePath(); context.fillStyle = face.fallback; context.fill();
+        }
+        context.beginPath(); context.moveTo(...face.points[0]);
+        for (const point of face.points.slice(1)) context.lineTo(...point);
+        context.closePath(); context.strokeStyle = '#26323888'; context.lineWidth = 1; context.stroke();
+      }
+      hotbarBlockIconCache = canvas;
+      return hotbarBlockIconCache;
+    }
+
+    function renderGameHotbar(ctx, canvas, inventory) {
+      const slotSize = 40, gap = 4, slotCount = 9;
+      const width = slotCount * slotSize + (slotCount - 1) * gap;
+      const barX = Math.round((canvas.width - width) / 2);
+      const barY = canvas.height - slotSize - 14;
+      ctx.save();
+      for (let slot = 0; slot < slotCount; slot++) {
+        const x = barX + slot * (slotSize + gap);
+        ctx.fillStyle = 'rgba(12, 24, 31, .66)';
+        ctx.fillRect(x, barY, slotSize, slotSize);
+        ctx.strokeStyle = slot === 0 ? '#9ee8dc' : 'rgba(220, 238, 236, .34)';
+        ctx.lineWidth = slot === 0 ? 3 : 1;
+        ctx.strokeRect(x + .5, barY + .5, slotSize - 1, slotSize - 1);
+      }
+      ctx.drawImage(cachedHotbarBlockIcon(), barX + 4, barY + 4, 32, 32);
+      const count = String(inventory);
+      drawHudText(ctx, count, barX + slotSize - 5 - hudTextWidth(count, 2), barY + 21, 2);
+      ctx.restore();
+    }
+
+    function renderGameCrosshair(ctx, canvas) {
+      const centerX = Math.round(canvas.width / 2);
+      const centerY = Math.round(canvas.height / 2);
+      ctx.save();
+      ctx.fillStyle = 'rgba(248, 255, 253, .92)';
+      ctx.shadowColor = 'rgba(8, 17, 22, .7)';
+      ctx.shadowBlur = 2;
+      ctx.fillRect(centerX - 1, centerY - 1, 3, 3);
+      ctx.fillRect(centerX - 1, centerY - 11, 3, 6);
+      ctx.fillRect(centerX - 1, centerY + 6, 3, 6);
+      ctx.fillRect(centerX - 11, centerY - 1, 6, 3);
+      ctx.fillRect(centerX + 6, centerY - 1, 6, 3);
+      ctx.restore();
+    }
+
+    function liveCameraEffects() {
+      if (state.mode !== 'live') {
+        return {fov: 70, translateX: 0, translateY: 0, roll: 0, pitch: 0};
+      }
+      const phase = -state.live.bobDistance;
+      const sine = Math.sin(phase * Math.PI);
+      const cosine = Math.cos(phase * Math.PI);
+      return {
+        fov: 70 * state.live.fovMultiplier,
+        translateX: sine * state.live.bobYaw * 0.5,
+        translateY: -Math.abs(cosine * state.live.bobYaw),
+        roll: sine * state.live.bobYaw * 3 * Math.PI / 180,
+        pitch: (Math.abs(Math.cos(phase * Math.PI - 0.2) * state.live.bobYaw) * 5
+          + state.live.bobPitch) * Math.PI / 180,
+      };
+    }
+
+    function applyViewBobbingToCameraPoint(point, effects) {
+      const pitchSine = Math.sin(effects.pitch), pitchCosine = Math.cos(effects.pitch);
+      const pitched = {
+        x: point.x,
+        y: point.y * pitchCosine + point.z * pitchSine,
+        z: -point.y * pitchSine + point.z * pitchCosine,
+      };
+      const rollSine = Math.sin(effects.roll), rollCosine = Math.cos(effects.roll);
+      return {
+        x: pitched.x * rollCosine - pitched.y * rollSine + effects.translateX,
+        y: pitched.x * rollSine + pitched.y * rollCosine + effects.translateY,
+        z: pitched.z,
+      };
+    }
+
+    function drawHeldItemWithViewBobbing(ctx, canvas, effects, draw) {
+      if (!effects.roll && !effects.pitch && !effects.translateX && !effects.translateY) {
+        draw();
+        return;
+      }
+      const focal = canvas.height / (2 * Math.tan(70 * Math.PI / 360));
+      const heldDepth = 0.85;
+      ctx.save();
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.translate(effects.translateX * focal / heldDepth,
+        -(effects.translateY / heldDepth + Math.tan(effects.pitch)) * focal);
+      ctx.rotate(-effects.roll);
+      ctx.translate(-canvas.width / 2, -canvas.height / 2);
+      draw();
+      ctx.restore();
+    }
+
+    function renderSimulation(ticks, index, alpha) {
+      const canvas = $('simFrame'), ctx = canvas.getContext('2d');
+      const current = ticks[index], next = ticks[Math.min(index + 1, ticks.length - 1)];
+      const mix = (a, b) => a + (b - a) * alpha;
+      const livePose = state.mode === 'live' ? state.live.renderPose : null;
+      const position = livePose?.position
+        ?? current.position.map((value, axis) => mix(value, next.position[axis]));
+      const yaw = livePose?.yaw ?? mix(current.yaw, next.yaw);
+      const pitch = livePose?.pitch ?? mix(current.pitch, next.pitch);
+      const cameraEffects = liveCameraEffects();
+      const eyeHeight = livePose?.eyeHeight
+        ?? mix(current.eye_height ?? 1.62, next.eye_height ?? 1.62);
+      const eye = [position[0], position[1] + eyeHeight, position[2]];
+      const look = [-Math.sin(yaw) * Math.cos(pitch), -Math.sin(pitch), Math.cos(yaw) * Math.cos(pitch)];
+      const right = [-Math.cos(yaw), 0, -Math.sin(yaw)];
+      const up = [
+        right[1] * look[2] - right[2] * look[1],
+        right[2] * look[0] - right[0] * look[2],
+        right[0] * look[1] - right[1] * look[0],
+      ];
+      const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+      const cameraPoint = point => {
+        const relative = [point[0] - eye[0], point[1] - eye[1], point[2] - eye[2]];
+        return applyViewBobbingToCameraPoint(
+          {x: dot(relative, right), y: dot(relative, up), z: dot(relative, look)},
+          cameraEffects);
+      };
+      const near = 0.04;
+      const clipNear = points => {
+        const clipped = [];
+        for (let i = 0; i < points.length; i++) {
+          const a = points[i], b = points[(i + 1) % points.length];
+          const aInside = a.z >= near, bInside = b.z >= near;
+          if (aInside) clipped.push(a);
+          if (aInside !== bInside) {
+            const amount = (near - a.z) / (b.z - a.z);
+            clipped.push({x: mix(a.x, b.x), y: mix(a.y, b.y), z: near});
+          }
+        }
+        return clipped;
+      };
+      const fov = cameraEffects.fov * Math.PI / 180;
+      const focal = canvas.height / (2 * Math.tan(fov / 2));
+      const project = point => [canvas.width / 2 + point.x / point.z * focal,
+                                canvas.height / 2 - point.y / point.z * focal];
+
+      const sky = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      sky.addColorStop(0, '#78b9e8'); sky.addColorStop(.6, '#a8d4ed'); sky.addColorStop(1, '#708ba1');
+      ctx.fillStyle = sky; ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      const snapshot = visibleWorldSnapshot(ticks, index);
+      const blocks = snapshot.blocks.filter(({position: [bx, by, bz]}) =>
+        Math.hypot(bx + .5 - eye[0], by + .5 - eye[1], bz + .5 - eye[2]) <= 49);
+      const selectedBlock = targetedBlock(blocks, eye, look);
+      if (renderTexturedWorldWebGl(blocks, eye, cameraPoint, focal, canvas, selectedBlock)) {
+        ctx.drawImage(worldWebGlRenderer.canvas, 0, 0);
+      } else {
+        const faces = [];
+        for (const {block, spec} of visibleBlockFaces(blocks, eye)) {
+          const [bx, by, bz] = block.position;
+          if (Math.hypot(bx + .5 - eye[0], by + .5 - eye[1], bz + .5 - eye[2]) > 48) continue;
+          const camera = spec.corners.map(([x,y,z]) => cameraPoint([bx+x, by+y, bz+z]));
+          const clipped = clipNear(camera);
+          if (clipped.length < 3) continue;
+          const projected = clipped.map(project);
+          if (!projectedFaceOnScreen(projected, canvas)) continue;
+          faces.push({points: projected, depth: clipped.reduce((sum, p) => sum + p.z, 0) / clipped.length,
+                      material: block.material, shade: spec.shade});
+        }
+        faces.sort((a, b) => b.depth - a.depth);
+        for (const face of faces) {
+          const base = face.material === 'quartz' ? [238, 238, 226]
+                     : face.material === 'gold' ? [249, 210, 52]
+                     : [136, 136, 136];
+          const color = base.map(channel => Math.round(channel * face.shade));
+          ctx.beginPath(); ctx.moveTo(face.points[0][0], face.points[0][1]);
+          for (const point of face.points.slice(1)) ctx.lineTo(point[0], point[1]);
+          ctx.closePath(); ctx.fillStyle = `rgb(${color.join(',')})`; ctx.fill();
+          ctx.strokeStyle = `rgba(35,42,38,${Math.min(.55, .12 + 5 / Math.max(face.depth, 1))})`;
+          ctx.lineWidth = Math.max(1, 3 / Math.max(face.depth, 1)); ctx.stroke();
+        }
+      }
+
+      const vignette = ctx.createRadialGradient(canvas.width/2, canvas.height/2, canvas.height*.25,
+                                                 canvas.width/2, canvas.height/2, canvas.width*.65);
+      vignette.addColorStop(0, '#0000'); vignette.addColorStop(1, '#07101966');
+      ctx.fillStyle = vignette; ctx.fillRect(0, 0, canvas.width, canvas.height);
+      renderGameCrosshair(ctx, canvas);
+
+      const inventory = Math.max(0, 64 - snapshot.placementCount);
+      drawHeldItemWithViewBobbing(ctx, canvas, cameraEffects, () =>
+        renderFirstPersonHeldQuartz(ctx, canvas, ticks, index, alpha, inventory));
+      renderGameHotbar(ctx, canvas, inventory);
+      renderGameHud(ctx, canvas);
+    }
+
+    function renderThirdPerson(ticks, index, alpha) {
+      const canvas = $('thirdPerson'), ctx = canvas.getContext('2d');
+      const current = ticks[index], next = ticks[Math.min(index + 1, ticks.length - 1)];
+      const mix = (a, b) => a + (b - a) * alpha;
+      const livePose = state.mode === 'live' ? state.live.renderPose : null;
+      const position = livePose?.position
+        ?? current.position.map((value, axis) => mix(value, next.position[axis]));
+      const yaw = livePose?.yaw ?? mix(current.yaw, next.yaw);
+      const forwardDirection = [-Math.sin(yaw), 0, Math.cos(yaw)];
+      const camera = [position[0] - forwardDirection[0] * 5, position[1] + 3.4,
+                      position[2] - forwardDirection[2] * 5];
+      const target = [position[0], position[1] + .8, position[2]];
+      const subtract = (a, b) => a.map((value, axis) => value - b[axis]);
+      const length = vector => Math.hypot(...vector);
+      const normalize = vector => vector.map(value => value / Math.max(length(vector), 1e-8));
+      const cross = (a, b) => [a[1] * b[2] - a[2] * b[1],
+                               a[2] * b[0] - a[0] * b[2],
+                               a[0] * b[1] - a[1] * b[0]];
+      const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+      const cameraForward = normalize(subtract(target, camera));
+      const cameraRight = normalize(cross(cameraForward, [0, 1, 0]));
+      const cameraUp = cross(cameraRight, cameraForward);
+      const cameraPoint = point => {
+        const relative = subtract(point, camera);
+        return {x: dot(relative, cameraRight), y: dot(relative, cameraUp),
+                z: dot(relative, cameraForward)};
+      };
+      const focal = canvas.height / (2 * Math.tan(65 * Math.PI / 360));
+      const project = point => [canvas.width / 2 + point.x / point.z * focal,
+                                canvas.height / 2 - point.y / point.z * focal];
+
+      const sky = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      sky.addColorStop(0, '#6ba5ce'); sky.addColorStop(.65, '#9bc7df'); sky.addColorStop(1, '#526b78');
+      ctx.fillStyle = sky; ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      const blocks = visibleWorldBlocks(ticks, index);
+      const faces = [];
+      for (const {block, spec} of visibleBlockFaces(blocks, camera)) {
+        const [bx, by, bz] = block.position;
+        const points = spec.corners.map(([x,y,z]) => cameraPoint([bx+x, by+y, bz+z]));
+        if (points.some(point => point.z <= .1)) continue;
+        const projected = points.map(project);
+        if (!projectedFaceOnScreen(projected, canvas)) continue;
+        faces.push({points: projected, depth: points.reduce((sum, point) => sum + point.z, 0) / 4,
+                    material: block.material, shade: spec.shade,
+                    texture: blockFaceTexture(block.material, spec)});
+      }
+      faces.sort((a, b) => b.depth - a.depth);
+      for (const face of faces) {
+        if (drawTexturedWorldFace(ctx, face.points, face.texture, face.shade)) continue;
+        const base = face.material === 'quartz' ? [238, 238, 226]
+                   : face.material === 'gold' ? [249, 210, 52]
+                   : [136, 136, 136];
+        ctx.fillStyle = `rgb(${base.map(channel => Math.round(channel * face.shade)).join(',')})`;
+        ctx.beginPath(); ctx.moveTo(...face.points[0]);
+        for (const point of face.points.slice(1)) ctx.lineTo(...point);
+        ctx.closePath(); ctx.fill(); ctx.strokeStyle = '#303833aa'; ctx.lineWidth = 1; ctx.stroke();
+      }
+
+      const sneaking = Boolean(current.action?.sneak);
+      const playerHeight = sneaking ? 1.45 : 1.8;
+      const feet = project(cameraPoint([position[0], position[1], position[2]]));
+      const shoulders = project(cameraPoint([position[0], position[1] + playerHeight * .7, position[2]]));
+      const head = project(cameraPoint([position[0], position[1] + playerHeight, position[2]]));
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = sneaking ? '#b8f45f' : '#426b9b'; ctx.lineWidth = 18;
+      ctx.beginPath(); ctx.moveTo(...feet); ctx.lineTo(...shoulders); ctx.stroke();
+      ctx.fillStyle = '#c6936a'; ctx.beginPath(); ctx.arc(head[0], head[1], 11, 0, Math.PI * 2); ctx.fill();
+      const lookTip = project(cameraPoint([position[0] + forwardDirection[0], position[1] + playerHeight,
+                                           position[2] + forwardDirection[2]]));
+      ctx.strokeStyle = '#72d8d0'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(...head); ctx.lineTo(...lookTip); ctx.stroke();
+      ctx.lineCap = 'butt';
+    }
+
+    function renderMap(ticks, index) {
+      const canvas = $('map'), ctx = canvas.getContext('2d');
+      const points = ticks.map(row => row.position);
+      const blocks = visibleWorldBlocks(ticks, index);
+      const xs = [...points.map(p => p[0]), ...blocks.flatMap(({position}) => [position[0], position[0] + 1])];
+      const zs = [...points.map(p => p[2]), ...blocks.flatMap(({position}) => [position[2], position[2] + 1])];
+      const minX = Math.min(...xs) - 1, maxX = Math.max(...xs) + 1;
+      const minZ = Math.min(...zs) - 1, maxZ = Math.max(...zs) + 1;
+      const span = Math.max(maxX - minX, maxZ - minZ, 4), pad = 28;
+      const scale = (canvas.width - pad * 2) / span;
+      const cx = (minX + maxX) / 2, cz = (minZ + maxZ) / 2;
+      const map = (x, z) => [canvas.width / 2 + (x - cx) * scale, canvas.height / 2 + (z - cz) * scale];
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = '#202721'; ctx.lineWidth = 1;
+      for (let n = -Math.ceil(span); n <= Math.ceil(span); n++) {
+        const [gx] = map(Math.floor(cx) + n, cz), [, gy] = map(cx, Math.floor(cz) + n);
+        ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, canvas.height); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(canvas.width, gy); ctx.stroke();
+      }
+      for (const {position: [x,,z], material} of blocks) {
+        const [px, pz] = map(x, z);
+        ctx.fillStyle = material === 'quartz' ? '#eeeae0'
+                      : material === 'gold' ? '#f9d234' : '#888';
+        ctx.fillRect(px, pz, scale, scale);
+        ctx.strokeStyle = material === 'quartz' ? '#cbc8bd'
+                        : material === 'gold' ? '#b88912' : '#626262';
+        ctx.strokeRect(px, pz, scale, scale);
+      }
+      ctx.strokeStyle = '#b8f45f'; ctx.lineWidth = 3; ctx.beginPath();
+      points.slice(0, index + 1).forEach((point, i) => { const [x,z] = map(point[0], point[2]); i ? ctx.lineTo(x,z) : ctx.moveTo(x,z); }); ctx.stroke();
+      const row = ticks[index], [px,pz] = map(row.position[0], row.position[2]);
+      ctx.fillStyle = '#b8f45f'; ctx.beginPath(); ctx.arc(px, pz, 7, 0, Math.PI * 2); ctx.fill();
+      const length = 28, dx = -Math.sin(row.yaw) * length, dz = Math.cos(row.yaw) * length;
+      ctx.strokeStyle = '#72d8d0'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(px,pz); ctx.lineTo(px+dx,pz+dz); ctx.stroke();
+    }
+
+    function play() {
+      if (!state.selected) return;
+      if (state.timer) { stop(); return; }
+      $('play').textContent = 'Pause';
+      state.lastTime = performance.now();
+      const animate = now => {
+        const length = state.selected.document.ticks.length;
+        state.playhead += Math.min(100, now - state.lastTime) / 50;
+        state.lastTime = now;
+        if (state.playhead >= length - 1) {
+          state.playhead = length - 1; state.tickIndex = length - 1;
+          renderTick(0, true); stop(); return;
+        }
+        const nextIndex = Math.floor(state.playhead);
+        const tickChanged = nextIndex !== state.tickIndex;
+        state.tickIndex = nextIndex;
+        renderTick(state.playhead - nextIndex, tickChanged);
+        state.timer = requestAnimationFrame(animate);
+      };
+      state.timer = requestAnimationFrame(animate);
+    }
+    function stop() { if (state.timer) cancelAnimationFrame(state.timer); state.timer = null; $('play').textContent = 'Play'; }
+    const liveKeyCodes = new Set([
+      'KeyW', 'KeyA', 'KeyS', 'KeyD', 'Space', 'ShiftLeft', 'ShiftRight',
+      'ControlLeft', 'ControlRight', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
+      'KeyF', 'KeyR',
+    ]);
+    $('refresh').onclick = refresh; $('play').onclick = play;
+    $('playSimulator').onclick = enterSimulatorExperience;
+    $('liveReset').onclick = () => resetSimulator();
+    $('captureMouse').onclick = captureMouse;
+    $('livePause').onclick = () => state.live.running ? pauseSimulator() : captureMouse();
+    $('exitSimulator').onclick = exitSimulatorExperience;
+    $('stepBack').onclick = () => { stop(); state.tickIndex = Math.max(0, state.tickIndex - 1); state.playhead = state.tickIndex; renderTick(0, true); };
+    $('stepForward').onclick = () => { stop(); state.tickIndex = Math.min(state.selected.document.ticks.length - 1, state.tickIndex + 1); state.playhead = state.tickIndex; renderTick(0, true); };
+    $('timeline').oninput = event => { stop(); state.tickIndex = Number(event.target.value) - 1; state.playhead = state.tickIndex; renderTick(0, true); };
+    window.addEventListener('keydown', event => {
+      if (event.target?.matches?.('input:not([type="range"]), textarea, select, [contenteditable="true"]')) return;
+      if (event.code === 'KeyR' && event.metaKey) return;
+      if (state.mode === 'live') {
+        if (event.code === 'Escape') {
+          event.preventDefault();
+          pauseSimulator();
+          return;
+        }
+        if (!liveKeyCodes.has(event.code)) return;
+        event.preventDefault();
+        primeGameAudio();
+        if (event.code === 'KeyR') {
+          if (!event.repeat) resetSimulator({preserveMouse: true, resume: state.live.running});
+          return;
+        }
+        if (event.code === 'ControlLeft' || event.code === 'ControlRight') {
+          if (!event.repeat) state.live.sprintToggled = !state.live.sprintToggled;
+          updateKeybinds();
+          startSimulator();
+          return;
+        }
+        if (event.code === 'KeyF') {
+          if (!event.repeat) state.live.pendingClick = true;
+        } else {
+          state.live.keys.add(event.code);
+        }
+        updateKeybinds();
+        startSimulator();
+        return;
+      }
+      if (event.code === 'Space' && !event.repeat) {
+        event.preventDefault();
+        play();
+      }
+    }, true);
+    window.addEventListener('keyup', event => {
+      if (event.code === 'KeyR' && event.metaKey) return;
+      if (state.mode !== 'live' || !liveKeyCodes.has(event.code)) return;
+      event.preventDefault();
+      state.live.keys.delete(event.code);
+      updateKeybinds();
+    }, true);
+    document.addEventListener('mousedown', event => {
+      if (state.mode !== 'live' || (event.button !== 0 && event.button !== 2)) return;
+      const mouseActive = document.pointerLockElement === $('simFrame')
+        || state.live.mouseFallback;
+      if (event.target !== $('simFrame') && !mouseActive) return;
+      event.preventDefault();
+      primeGameAudio();
+      recordClick(event.button === 0 ? 'left' : 'right');
+      if (event.button === 2 && event.shiftKey) {
+        state.live.lastShiftRightClickTime = performance.now();
+      }
+      captureMouse();
+      if (event.button === 2) {
+        state.live.mouseUse = true;
+        state.live.pendingClick = true;
+      }
+      updateKeybinds();
+    }, true);
+    window.addEventListener('mouseup', event => {
+      if (event.button !== 2) return;
+      state.live.mouseUse = false;
+      updateKeybinds();
+    }, true);
+    $('simFrame').addEventListener('contextmenu', event => {
+      if (state.mode === 'live') event.preventDefault();
+    });
+    $('simFrame').addEventListener('blur', () => {
+      const mouseActive = document.pointerLockElement === $('simFrame')
+        || state.live.mouseFallback;
+      if (state.mode === 'live' && mouseActive && document.hasFocus()) {
+        requestAnimationFrame(focusSimulatorInput);
+      }
+    });
+    document.addEventListener('mousemove', event => {
+      const mouseActive = document.pointerLockElement === $('simFrame')
+        || state.live.mouseFallback;
+      if (state.mode !== 'live' || !mouseActive) return;
+      if (document.activeElement !== $('simFrame') && document.hasFocus()) focusSimulatorInput();
+      applyMouseLook(event.movementX, event.movementY);
+    });
+    document.addEventListener('pointerlockchange', () => {
+      const captured = document.pointerLockElement === $('simFrame');
+      if (captured) state.live.mouseFallback = false;
+      const mouseActive = captured || state.live.mouseFallback;
+      document.body.classList.toggle('mouse-captured', mouseActive);
+      $('captureMouse').textContent = mouseActive ? 'Mouse active' : 'Capture mouse';
+      if (!mouseActive && state.mode === 'live' && state.live.running) {
+        pauseSimulator('Paused · click the view to resume');
+      }
+    });
+    document.addEventListener('pointerlockerror', () => {
+      if (state.mode !== 'live' || !document.hasFocus()) return;
+      enableFallbackMouse();
+      focusSimulatorInput();
+      startSimulator();
+    });
+    window.addEventListener('focus', () => {
+      if (state.mode !== 'live') return;
+      requestAnimationFrame(() => {
+        focusSimulatorInput();
+        if (document.pointerLockElement === $('simFrame') || state.live.mouseFallback) {
+          startSimulator();
+        }
+      });
+    });
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) pauseSimulator('Paused · tab hidden');
+    });
+    const standaloneSimulator = Boolean(window.BridgeSimulator) || [
+      '/simulator', '/simulator/', '/simulator.html', '/simulator/index.html',
+    ].includes(location.pathname);
+    if (standaloneSimulator) {
+      document.title = 'Bridge Simulator';
+      document.body.classList.add('standalone-simulator');
+      if (diagnosticsEnabled) {
+        const diagnostics = document.createElement('output');
+        diagnostics.id = 'performanceDiagnostics';
+        diagnostics.className = 'performance-diagnostics';
+        diagnostics.textContent = 'Collecting frame and tick timing…';
+        document.body.append(diagnostics);
+      }
+      enterSimulatorExperience().catch(error => {
+        $('liveStatus').textContent = `Could not start: ${error.message}`;
+      });
+    } else {
+      refresh().catch(error => { $('runs').textContent = `Could not load runs: ${error}`; });
+    }
+  </script>
+</body>
+</html>
