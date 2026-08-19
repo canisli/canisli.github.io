@@ -6,26 +6,26 @@ html {
   background-color: #e4f3d8;
 }
 
-html.content-astro,
-body.content-astro.page-background {
+html.content-astrophotography,
+body.content-astrophotography.page-background {
   background-color: rgb(31 41 55);
 }
 
-body.content-astro {
+body.content-astrophotography {
   color: #e5e7eb;
   color-scheme: dark;
 }
 
-body.content-astro .text-neutral-800,
-body.content-astro .text-neutral-900 {
+body.content-astrophotography .text-neutral-800,
+body.content-astrophotography .text-neutral-900 {
   color: #f9fafb;
 }
 
-body.content-astro .text-neutral-500 {
+body.content-astrophotography .text-neutral-500 {
   color: #9ca3af;
 }
 
-body.content-astro .prose {
+body.content-astrophotography .prose {
   --tw-prose-body: #d1d5db;
   --tw-prose-headings: #f9fafb;
   --tw-prose-lead: #d1d5db;
@@ -69,7 +69,7 @@ body.content-astro .prose {
   background-color: #0077b5;
 }
 
-.link-astro{
+.link-astrophotography{
   background-color: #06068a;
 }
 .link-googlescholar{
