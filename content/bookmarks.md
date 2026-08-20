@@ -35,9 +35,11 @@ title: Bookmarks
 - [Sunset Geometry](https://www.shapeoperator.com/2016/12/12/sunset-geometry/)
 
 ### Fun
+- [Minecraft Bridging Simulator](https://canis.li/bridging/)
 - [Why Did the Chicken Cross the Road?](https://www.physics.harvard.edu/physics/undergrad/humor)
 - [Garden-path sentence](https://en.wikipedia.org/wiki/Garden-path_sentence)
 - [REVIEW: Reentry, by Eric Berger](https://www.thepsmiths.com/p/review-reentry-by-eric-berger?publication_id=1271258&utm_campaign=email-post-title&r=tuaya)
 - [On the Possibility of Discovering Exoplanets within our Solar System](https://arxiv.org/abs/2203.17075)
 - [First-move Advantage in Chess](https://en.wikipedia.org/wiki/First-move_advantage_in_chess)
 - [List of Greek Mythological Creatures](https://en.wikipedia.org/wiki/List_of_Greek_mythological_creatures)
+
