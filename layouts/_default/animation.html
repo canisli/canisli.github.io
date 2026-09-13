@@ -1,0 +1,13 @@
+{{ define "main" }}
+  <article class="mt-10 flex flex-col items-center justify-center">
+    <header>
+      <h1 class="mb-6 mt-2 text-center text-4xl font-extrabold text-neutral-800 dark:text-white">
+        {{ .Title | emojify }}
+      </h1>
+      <p class="mb-6 text-center text-base"><a href="https://canis.li">Canis Li</a> · <time datetime="2026-07">July 2026</time></p>
+    </header>
+    <section class="prose dark:prose-invert">
+      {{ .Content | emojify }}
+    </section>
+  </article>
+{{ end }}

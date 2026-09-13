@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head>
+<html lang="en" class="content-animation"><head>
   <meta charset="utf-8" />
   
     <meta http-equiv="content-language" content="en" />
@@ -14,7 +14,7 @@
   
   
   
-  <link rel="canonical" href="https://canis.li/animation/" />
+  <link rel="canonical" href="https://canis.li/research/animation/" />
   
   
   
@@ -27,8 +27,8 @@
   <link
     type="text/css"
     rel="stylesheet"
-    href="/css/main.bundle.min.82a04fe21835a46a84a1a648b03bbb90d1414025f1c7b19a4ab26fef69a409fd5d9b0e1bd3c9be9edb49b76238f91f7d4acb46d9951e3b76fc3dfe9258c66d67.css"
-    integrity="sha512-gqBP4hg1pGqEoaZIsDu7kNFBQCXxx7GaSrJv72mkCf1dmw4b08m&#43;nttJt2I4&#43;R99SstG2ZUeO3b8Pf6SWMZtZw=="
+    href="/css/main.bundle.min.31dc086a8e7319222ad767b9df71c96954e3798e23eb726619d086529a3553f3dde394c119632c35f5d19a9cb1907b3a30a44a1b1594b26f835deefab7958566.css"
+    integrity="sha512-MdwIao5zGSIq12e533HJaVTjeY4j63JmGdCGUpo1U/Pd45TBGWMsNfXRmpyxkHs6MKRKGxWUsm&#43;DXe76t5WFZg=="
   />
   
   
@@ -43,19 +43,17 @@
   
   
   
-  <meta property="og:url" content="https://canis.li/animation/">
+  <meta property="og:url" content="https://canis.li/research/animation/">
   <meta property="og:site_name" content="Canis Li">
   <meta property="og:title" content="Video Models as Motion Priors for 3D Rig Animation">
-  <meta property="og:description" content="Inspired by recent work on video-model planning in robotics, we explore whether a video model can serve as a motion prior for 3D character animation. Given a frame rendered by a game engine and a goal such as “open the door,” an image-to-video model generates a sequence depicting the requested motion. An inverse dynamics model (IDM) then recovers the character’s root transform and joint rotations from each generated frame.
-The pipeline has four stages:">
+  <meta property="og:description" content="Download the demo video. Sitting on a sloped surface: WAN 2.7 output and Unity reconstruction. Intro Inspired by recent work on video-model planning in robotics, we explore whether a video model can serve as a motion prior for 3D character animation. Given a frame rendered by a game engine and a goal such as “open the door,” an image-to-video model generates a sequence depicting the requested motion. An inverse dynamics model (IDM) then recovers the character’s root transform and joint rotations from each generated frame.">
   <meta property="og:locale" content="en">
   <meta property="og:type" content="article">
 
   
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Video Models as Motion Priors for 3D Rig Animation">
-  <meta name="twitter:description" content="Inspired by recent work on video-model planning in robotics, we explore whether a video model can serve as a motion prior for 3D character animation. Given a frame rendered by a game engine and a goal such as “open the door,” an image-to-video model generates a sequence depicting the requested motion. An inverse dynamics model (IDM) then recovers the character’s root transform and joint rotations from each generated frame.
-The pipeline has four stages:">
+  <meta name="twitter:description" content="Download the demo video. Sitting on a sloped surface: WAN 2.7 output and Unity reconstruction. Intro Inspired by recent work on video-model planning in robotics, we explore whether a video model can serve as a motion prior for 3D character animation. Given a frame rendered by a game engine and a goal such as “open the door,” an image-to-video model generates a sequence depicting the requested motion. An inverse dynamics model (IDM) then recovers the character’s root transform and joint rotations from each generated frame.">
 
   
   
@@ -88,20 +86,27 @@ The pipeline has four stages:">
   
 </head>
 <body
-    class="page-background bg-neutral-50 m-auto flex h-screen max-w-7xl flex-col px-6 text-lg leading-7 text-neutral-900 sm:px-14 md:px-24 lg:px-32 dark:bg-neutral-800 dark:text-white"
+    class="page-background content-animation bg-neutral-50 m-auto flex h-screen max-w-7xl flex-col px-6 text-lg leading-7 text-neutral-900 sm:px-14 md:px-24 lg:px-32 dark:bg-neutral-800 dark:text-white"
   >
     <main class="flex-grow">
   <article class="mt-10 flex flex-col items-center justify-center">
-    <nav class="place-self-start">
-      <a href="/" class="text-neutral-500">&larr; Home</a>
-    </nav>
     <header>
       <h1 class="mb-6 mt-2 text-center text-4xl font-extrabold text-neutral-800 dark:text-white">
         Video Models as Motion Priors for 3D Rig Animation
       </h1>
+      <p class="mb-6 text-center text-base"><a href="https://canis.li">Canis Li</a> · <time datetime="2026-07">July 2026</time></p>
     </header>
     <section class="prose dark:prose-invert">
-      <p>Inspired by recent work on video-model planning in robotics, we explore whether a video model can serve as a motion prior for 3D character animation. Given a frame rendered by a game engine and a goal such as “open the door,” an image-to-video model generates a sequence depicting the requested motion. An inverse dynamics model (IDM) then recovers the character’s root transform and joint rotations from each generated frame.</p>
+      <figure>
+  <video controls playsinline preload="metadata" poster="island-reconstruction.jpg" aria-label="Sitting on a sloped surface: WAN 2.7 output and Unity reconstruction." style="display: block; width: 100%; height: auto;">
+    <source src="island-reconstruction.mp4" type="video/mp4">
+    <a href="island-reconstruction.mp4">Download the demo video</a>.
+  </video>
+  <figcaption>Sitting on a sloped surface: WAN 2.7 output and Unity reconstruction.</figcaption>
+</figure>
+
+<h2 id="intro">Intro</h2>
+<p>Inspired by recent work on video-model planning in robotics, we explore whether a video model can serve as a motion prior for 3D character animation. Given a frame rendered by a game engine and a goal such as “open the door,” an image-to-video model generates a sequence depicting the requested motion. An inverse dynamics model (IDM) then recovers the character’s root transform and joint rotations from each generated frame.</p>
 <p>The pipeline has four stages:</p>
 <ol>
 <li>Render the character in its starting pose.</li>
@@ -111,37 +116,31 @@ The pipeline has four stages:">
 </ol>
 <p>This is powerful because the video model handles the semantic problem: deciding how the character should climb, balance, sit, or step over an obstacle. The IDM only has to recover the visible configuration on the target rig.</p>
 <h2 id="training-the-idm">Training the IDM</h2>
-<p>Our IDM is based on <a href="https://arxiv.org/abs/2305.20091">HMR 2.0</a>, which recovers an SMPL human body from a monocular image. We keep its pretrained visual backbone, fine-tune the transformer decoder, and replace the SMPL output layer with a head for our animation rig.</p>
-<p>The model operates per frame rather than autoregressively. It can process a complete generated clip offline, and a bad estimate in one frame does not become the input to the next frame.</p>
+<p>Our IDM is adapted from <a href="https://arxiv.org/abs/2305.20091"><strong>HMR 2.0</strong></a>, a monocular human pose estimator for SMPL. We retain the pretrained visual backbone, fine-tune the transformer decoder, and replace the SMPL prediction head with one that outputs the parameters of our animation rig.</p>
+<p>Each frame is processed independently. In practice, we found that simple temporal smoothing was sufficient to remove frame-to-frame jitter, without requiring an autoregressive model.</p>
 <h3 id="training-data">Training data</h3>
 <p>Because the IDM predicts absolute pose rather than the change between consecutive frames, its training examples do not need to come from coherent motion sequences. Training requires only a rigged character and a rendering engine such as Blender.</p>
 <p>For each example, we pose the skeleton, sample a camera viewpoint around the character, render an image, and save the corresponding joint rotations and camera parameters. The rendered image is the input to the IDM, while the known rig and camera parameters provide direct supervision.</p>
 <p>Training poses need not come from an existing animation library. Our experiments suggest that randomly sampling the rig’s configuration space is a practical alternative, avoiding the need for a curated motion dataset. Designing a sampling distribution that provides broad coverage while remaining concentrated on plausible configurations is an interesting problem that we do not investigate here.</p>
-<h3 id="predicting-root-position">Predicting root position</h3>
-<p>Monocular depth is normally ambiguous, but the engine provides information that is unavailable in an &ldquo;in-the-wild&rdquo; pose-estimation setting. In particular, it knows the character’s physical scale, the camera intrinsics, and the crop applied to the input image.</p>
-<p>Our root head predicts three quantities in crop coordinates:</p>
-<ul>
-<li>the projected root position along the horizontal axis;</li>
-<li>the projected root position along the vertical axis; and</li>
-<li>the projected character size.</li>
-</ul>
-<p>We combine these predictions with the known character scale, camera intrinsics, and crop transform to invert the perspective projection and recover the root position in camera coordinates. The IDM also predicts the root orientation in camera coordinates, which we transform back into the engine’s world frame.</p>
+<h3 id="exploiting-engine-control-for-root-position">Exploiting engine control for root position</h3>
+<p>Unlike generic monocular pose estimation, our setting gives us direct control over the rendering pipeline. We know the character’s physical scale, the camera intrinsics, and the exact crop transform. We can also modify the render itself—for example, hiding scene elements that would otherwise occlude the character.</p>
+<p>For example, we use this privileged information to recover the character’s root position. The root head predicts the projected root 2D position and the projected character size in crop space.  Combined with the known character scale, camera intrinsics, and crop transform, these are sufficient to invert the perspective projection and  recover the root position in camera coordinates.</p>
 <h2 id="examples">Examples</h2>
 <p>We have recovered free-form dance motions as well as scene-conditioned interactions: stepping onto a crate and sitting on a sloped outdoor surface.</p>
 <figure>
-  <video controls playsinline preload="metadata" poster="island-reconstruction.jpg" aria-label="WAN 2.7 output and Unity reconstruction in an outdoor island scene." style="display: block; width: 100%; height: auto;">
-    <source src="island-reconstruction.mp4" type="video/mp4">
-    <a href="island-reconstruction.mp4">Download the demo video</a>.
+  <video controls playsinline preload="metadata" poster="crate-reconstruction.jpg" aria-label="Stepping onto a crate: WAN 2.7 output and Unity reconstruction." style="display: block; width: 100%; height: auto;">
+    <source src="crate-reconstruction.mp4" type="video/mp4">
+    <a href="crate-reconstruction.mp4">Download the demo video</a>.
   </video>
-  <figcaption>WAN 2.7 output and Unity reconstruction in an outdoor island scene.</figcaption>
+  <figcaption>Stepping onto a crate: WAN 2.7 output and Unity reconstruction.</figcaption>
 </figure>
 
 <figure>
-  <video controls playsinline preload="metadata" poster="slide-reconstruction.jpg" aria-label="WAN 2.7 output and Unity reconstruction in a playground slide scene." style="display: block; width: 100%; height: auto;">
+  <video controls playsinline preload="metadata" poster="slide-reconstruction.jpg" aria-label="Sliding down a slide: WAN 2.7 output and Unity reconstruction." style="display: block; width: 100%; height: auto;">
     <source src="slide-reconstruction.mp4" type="video/mp4">
     <a href="slide-reconstruction.mp4">Download the demo video</a>.
   </video>
-  <figcaption>WAN 2.7 output and Unity reconstruction in a playground slide scene.</figcaption>
+  <figcaption>Sliding down a slide: WAN 2.7 output and Unity reconstruction.</figcaption>
 </figure>
 
 <h2 id="limitations-and-future-work">Limitations and Future Work</h2>
