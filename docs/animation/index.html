@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en"><head>
+  <meta charset="utf-8" />
+  
+    <meta http-equiv="content-language" content="en" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  
+  <title>Video Models as Motion Priors for 3D Rig Animation &middot; Canis Li</title>
+    <meta name="title" content="Video Models as Motion Priors for 3D Rig Animation &middot; Canis Li" />
+  
+  <meta name="description" content="" />
+  
+  
+  
+  <link rel="canonical" href="https://canis.li/animation/" />
+  
+  
+  
+  
+  
+  
+    
+  
+  
+  <link
+    type="text/css"
+    rel="stylesheet"
+    href="/css/main.bundle.min.82a04fe21835a46a84a1a648b03bbb90d1414025f1c7b19a4ab26fef69a409fd5d9b0e1bd3c9be9edb49b76238f91f7d4acb46d9951e3b76fc3dfe9258c66d67.css"
+    integrity="sha512-gqBP4hg1pGqEoaZIsDu7kNFBQCXxx7GaSrJv72mkCf1dmw4b08m&#43;nttJt2I4&#43;R99SstG2ZUeO3b8Pf6SWMZtZw=="
+  />
+  
+  
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:url" content="https://canis.li/animation/">
+  <meta property="og:site_name" content="Canis Li">
+  <meta property="og:title" content="Video Models as Motion Priors for 3D Rig Animation">
+  <meta property="og:description" content="Inspired by recent work on video-model planning in robotics, we explore whether a video model can serve as a motion prior for 3D character animation. Given a frame rendered by a game engine and a goal such as “open the door,” an image-to-video model generates a sequence depicting the requested motion. An inverse dynamics model (IDM) then recovers the character’s root transform and joint rotations from each generated frame.
+The pipeline has four stages:">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+
+  
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Video Models as Motion Priors for 3D Rig Animation">
+  <meta name="twitter:description" content="Inspired by recent work on video-model planning in robotics, we explore whether a video model can serve as a motion prior for 3D character animation. Given a frame rendered by a game engine and a goal such as “open the door,” an image-to-video model generates a sequence depicting the requested motion. An inverse dynamics model (IDM) then recovers the character’s root transform and joint rotations from each generated frame.
+The pipeline has four stages:">
+
+  
+  
+    <meta name="generator" content="Hugo 0.155.2">
+  
+  
+  
+  
+  
+  
+  
+  
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-T3Y23EN70G"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-T3Y23EN70G');
+        }
+      </script>
+
+
+  
+  
+</head>
+<body
+    class="page-background bg-neutral-50 m-auto flex h-screen max-w-7xl flex-col px-6 text-lg leading-7 text-neutral-900 sm:px-14 md:px-24 lg:px-32 dark:bg-neutral-800 dark:text-white"
+  >
+    <main class="flex-grow">
+  <article class="mt-10 flex flex-col items-center justify-center">
+    <nav class="place-self-start">
+      <a href="/" class="text-neutral-500">&larr; Home</a>
+    </nav>
+    <header>
+      <h1 class="mb-6 mt-2 text-center text-4xl font-extrabold text-neutral-800 dark:text-white">
+        Video Models as Motion Priors for 3D Rig Animation
+      </h1>
+    </header>
+    <section class="prose dark:prose-invert">
+      <p>Inspired by recent work on video-model planning in robotics, we explore whether a video model can serve as a motion prior for 3D character animation. Given a frame rendered by a game engine and a goal such as “open the door,” an image-to-video model generates a sequence depicting the requested motion. An inverse dynamics model (IDM) then recovers the character’s root transform and joint rotations from each generated frame.</p>
+<p>The pipeline has four stages:</p>
+<ol>
+<li>Render the character in its starting pose.</li>
+<li>Pass the image and a text instruction, such as “the character steps onto the crate,” to an image-to-video model.</li>
+<li>Estimate the character’s root position, root orientation, and local joint rotations in each generated frame.</li>
+<li>Smooth the resulting pose trajectory and replay it on the original rig.</li>
+</ol>
+<p>This is powerful because the video model handles the semantic problem: deciding how the character should climb, balance, sit, or step over an obstacle. The IDM only has to recover the visible configuration on the target rig.</p>
+<h2 id="training-the-idm">Training the IDM</h2>
+<p>Our IDM is based on <a href="https://arxiv.org/abs/2305.20091">HMR 2.0</a>, which recovers an SMPL human body from a monocular image. We keep its pretrained visual backbone, fine-tune the transformer decoder, and replace the SMPL output layer with a head for our animation rig.</p>
+<p>The model operates per frame rather than autoregressively. It can process a complete generated clip offline, and a bad estimate in one frame does not become the input to the next frame.</p>
+<h3 id="training-data">Training data</h3>
+<p>Because the IDM predicts absolute pose rather than the change between consecutive frames, its training examples do not need to come from coherent motion sequences. Training requires only a rigged character and a rendering engine such as Blender.</p>
+<p>For each example, we pose the skeleton, sample a camera viewpoint around the character, render an image, and save the corresponding joint rotations and camera parameters. The rendered image is the input to the IDM, while the known rig and camera parameters provide direct supervision.</p>
+<p>Training poses need not come from an existing animation library. Our experiments suggest that randomly sampling the rig’s configuration space is a practical alternative, avoiding the need for a curated motion dataset. Designing a sampling distribution that provides broad coverage while remaining concentrated on plausible configurations is an interesting problem that we do not investigate here.</p>
+<h3 id="predicting-root-position">Predicting root position</h3>
+<p>Monocular depth is normally ambiguous, but the engine provides information that is unavailable in an &ldquo;in-the-wild&rdquo; pose-estimation setting. In particular, it knows the character’s physical scale, the camera intrinsics, and the crop applied to the input image.</p>
+<p>Our root head predicts three quantities in crop coordinates:</p>
+<ul>
+<li>the projected root position along the horizontal axis;</li>
+<li>the projected root position along the vertical axis; and</li>
+<li>the projected character size.</li>
+</ul>
+<p>We combine these predictions with the known character scale, camera intrinsics, and crop transform to invert the perspective projection and recover the root position in camera coordinates. The IDM also predicts the root orientation in camera coordinates, which we transform back into the engine’s world frame.</p>
+<h2 id="examples">Examples</h2>
+<p>We have recovered free-form dance motions as well as scene-conditioned interactions: stepping onto a crate and sitting on a sloped outdoor surface.</p>
+<figure>
+  <video controls playsinline preload="metadata" poster="island-reconstruction.jpg" aria-label="WAN 2.7 output and Unity reconstruction in an outdoor island scene." style="display: block; width: 100%; height: auto;">
+    <source src="island-reconstruction.mp4" type="video/mp4">
+    <a href="island-reconstruction.mp4">Download the demo video</a>.
+  </video>
+  <figcaption>WAN 2.7 output and Unity reconstruction in an outdoor island scene.</figcaption>
+</figure>
+
+<figure>
+  <video controls playsinline preload="metadata" poster="slide-reconstruction.jpg" aria-label="WAN 2.7 output and Unity reconstruction in a playground slide scene." style="display: block; width: 100%; height: auto;">
+    <source src="slide-reconstruction.mp4" type="video/mp4">
+    <a href="slide-reconstruction.mp4">Download the demo video</a>.
+  </video>
+  <figcaption>WAN 2.7 output and Unity reconstruction in a playground slide scene.</figcaption>
+</figure>
+
+<h2 id="limitations-and-future-work">Limitations and Future Work</h2>
+<ul>
+<li><strong>Static scenes.</strong> Our current pipeline assumes that the environment remains fixed; interactions with moving objects would require recovering and replaying their trajectories alongside the character.</li>
+<li><strong>Occlusion.</strong> Pose recovery degrades when limbs are hidden by the scene, and while we experimented with rendering occluding geometry transparently for the video model, a more principled solution would use multiple generated viewpoints.</li>
+<li><strong>Camera motion.</strong> Our current setup assumes a fixed camera with known intrinsics and extrinsics; supporting a moving camera would require estimating the camera parameters for each generated frame before recovering the character’s motion in world coordinates.</li>
+<li><strong>Hands and face.</strong> We currently recover only body motion and leave hand articulation and facial animation to future work.</li>
+</ul>
+<h2 id="beyond-humanoid-characters">Beyond Humanoid Characters</h2>
+<p>Our experiments use one humanoid skeleton, and the current IDM inherits a human-specific prior from HMR 2.0. In principle, each distinct skeleton would require its own IDM, while visually different characters sharing a skeleton could use the same model by generating and reconstructing motion through a common canonical appearance.</p>
+<p>The broader method is not inherently restricted to humans. With a more general visual backbone and synthetic renders of the target rig, we expect the same approach to apply to articulated characters such as dragons, animals, and fictional creatures. These are precisely the cases in which conventional motion-capture data is hardest to obtain, but static poses can still be generated cheaply inside a rendering engine.</p>
+
+    </section>
+  </article>
+</main><footer class="py-10">
+  <div class="text-center">
+    
+    <p class="text-sm text-neutral-500 dark:text-neutral-400">
+        &copy;
+        2026
+        
+    </p>
+    
+    
+      <p class="text-xs text-neutral-500 dark:text-neutral-400">
+        
+        
+        Powered by <a class="hover:underline hover:decoration-primary-400 hover:text-primary-500"
+          href="https://gohugo.io/" target="_blank" rel="noopener noreferrer">Hugo</a> &amp; <a class="hover:underline hover:decoration-primary-400 hover:text-primary-500" href="https://git.io/hugo-lynx" target="_blank" rel="noopener noreferrer">Lynx</a>
+      </p>
+    
+  </div>
+  
+  
+</footer>
+</body>
+</html>

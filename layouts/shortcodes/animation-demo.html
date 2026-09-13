@@ -1,0 +1,7 @@
+<figure>
+  <video controls playsinline preload="metadata" poster="{{ .Get "poster" }}" aria-label="{{ .Get "caption" }}" style="display: block; width: 100%; height: auto;">
+    <source src="{{ .Get "src" }}" type="video/mp4">
+    <a href="{{ .Get "src" }}">Download the demo video</a>.
+  </video>
+  <figcaption>{{ .Get "caption" }}</figcaption>
+</figure>
