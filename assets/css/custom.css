@@ -103,6 +103,19 @@ body.content-bookmarks article {
   margin-bottom: 4rem;
 }
 
+body.content-bookmarks .prose a {
+  text-decoration: underline;
+}
+
+@media (prefers-color-scheme: light) {
+  body.content-bookmarks .prose {
+    --tw-prose-body: #000;
+    --tw-prose-headings: #000;
+    --tw-prose-links: #000;
+    --tw-prose-bold: #000;
+  }
+}
+
 html.content-animation,
 body.content-animation.page-background {
   background-color: #f7f7f7;
