@@ -18,6 +18,7 @@ title: Bookmarks
 - [South Atlantic Anomaly](https://en.wikipedia.org/wiki/South_Atlantic_Anomaly)  
 - [Speckle Imaging](https://en.wikipedia.org/wiki/Speckle_imaging)  
 - [Carrington Event](https://en.wikipedia.org/wiki/Carrington_Event)  
+- [Triboelectric effect](https://en.wikipedia.org/wiki/Triboelectric_effect)
 - [The Hum](https://en.wikipedia.org/wiki/The_Hum)  
 - [Deep-Sea Gigantism](https://en.wikipedia.org/wiki/Deep-sea_gigantism)  
 - [Impossible Color](https://en.wikipedia.org/wiki/Impossible_color)  
@@ -42,4 +43,3 @@ title: Bookmarks
 - [On the Possibility of Discovering Exoplanets within our Solar System](https://arxiv.org/abs/2203.17075)
 - [First-move Advantage in Chess](https://en.wikipedia.org/wiki/First-move_advantage_in_chess)
 - [List of Greek Mythological Creatures](https://en.wikipedia.org/wiki/List_of_Greek_mythological_creatures)
-

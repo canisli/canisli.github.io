@@ -104,7 +104,44 @@ body.content-bookmarks article {
 }
 
 body.content-bookmarks .prose a {
-  text-decoration: underline;
+  text-decoration: none;
+  color: #404040;
+}
+
+.bookmark-preview {
+  position: fixed;
+  z-index: 10;
+  width: min(280px, calc(100vw - 24px));
+  padding: 6px;
+  border-radius: 8px;
+  background: #f7f7f7;
+  box-shadow: 0 4px 20px #0003;
+  pointer-events: none;
+}
+
+.bookmark-preview img {
+  display: block;
+  width: 100%;
+  max-height: min(240px, calc(100vh - 36px));
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+body.content-bookmarks .prose a:hover,
+body.content-bookmarks .prose a:focus-visible {
+  background: transparent;
+  color: #2563eb;
+}
+
+@media (prefers-color-scheme: dark) {
+  body.content-bookmarks .prose a {
+    color: #c4c4c4;
+  }
+
+  body.content-bookmarks .prose a:hover,
+  body.content-bookmarks .prose a:focus-visible {
+    color: #60a5fa;
+  }
 }
 
 @media (prefers-color-scheme: light) {
