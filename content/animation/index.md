@@ -35,9 +35,9 @@ Training therefore requires only a rigged character and a rendering engine such 
 
 ### Exploiting engine control for root position
 
-Unlike generic monocular pose estimation, our setting gives us direct control over the rendering pipeline. We know the character’s physical scale, the camera intrinsics, and the exact crop transform. We can also modify the render itself—for example, hiding scene elements that would otherwise occlude the character.
+Unlike generic monocular pose estimation, our setting gives us direct control over the rendering pipeline. We know the character’s physical scale and the camera intrinsics. We can also modify the render itself—for example, hiding scene elements that would otherwise occlude the character.
 
-For example, we use this privileged information to recover the character’s root position. The root head predicts the projected root 2D position and the projected character size in crop space.  Combined with the known character scale, camera intrinsics, and crop transform, these are sufficient to invert the perspective projection and  recover the root position in camera coordinates.
+Before pose estimation, the image is cropped around the detected character and resized. We retain this transformation so predictions can be mapped back to the original image. The root head predicts the character’s projected root position and size; together with the known character scale and camera intrinsics, these let us recover its root position in camera coordinates.
 
 ## Examples
 
