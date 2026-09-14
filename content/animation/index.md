@@ -29,6 +29,8 @@ Each frame is processed independently. In practice, we found that simple tempora
 
 Because the IDM predicts an absolute pose from each frame rather than a change from the previous frame, training examples do not need to come from motion sequences. Instead of collecting human animations, we can generate training data by randomly sampling valid joint rotations and rendering the resulting poses.
 
+{{< figure class="training-pose-grid" src="training-pose-grid.png" alt="Six independently sampled character poses rendered in Blender, each with its known rig skeleton overlaid in red." caption="Randomly sampled poses and camera views rendered in Blender. Red  skeletons visualize the known poses used as supervision." >}}
+
 Training therefore requires only a rigged character and a rendering engine such as Blender. For each example, we sample a pose and camera viewpoint, render the character, and record the corresponding joint rotations. The rendered image is used as input to the IDM, with the known pose providing supervision.
 
 ### Exploiting engine control for root position

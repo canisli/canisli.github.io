@@ -204,6 +204,18 @@ body.content-animation .prose figure {
   transform: translateX(-50%);
 }
 
+body.content-animation .prose figure.training-pose-grid {
+  width: min(34rem, calc(100% - 2rem));
+}
+
+body.content-animation .prose figure.training-pose-grid img {
+  margin-bottom: 0;
+}
+
+body.content-animation .prose figure.training-pose-grid figcaption p {
+  margin-top: 0;
+}
+
 @media (prefers-color-scheme: dark) {
   html.content-animation,
   body.content-animation.page-background {
