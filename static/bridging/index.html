@@ -3,7 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Bridge Rollouts</title>
+  <title>Bridging Simulator</title>
+  <meta name="description" content="Bridging Simulator">
+  <meta property="og:title" content="Bridging Simulator">
+  <meta property="og:description" content="Bridging Simulator">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://canis.li/bridging/">
+  <meta name="twitter:title" content="Bridging Simulator">
+  <meta name="twitter:description" content="Bridging Simulator">
   <style>
     :root {
       color-scheme: dark;
@@ -156,6 +163,15 @@
     body.standalone-simulator .shift-indicator,
     body.standalone-simulator .controls { display: none; }
     body.standalone-simulator .fps canvas { outline: none; }
+    #settings {
+      width: min(360px, calc(100vw - 32px)); padding: 24px;
+      color: var(--text); background: var(--panel); border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+    #settings::backdrop { background: #0008; }
+    #settings h2 { margin: 0 0 20px; }
+    #settings input { width: 100%; margin: 16px 0 24px; accent-color: var(--lime); }
+    #settings button { width: 100%; }
     .performance-diagnostics {
       position: fixed; z-index: 20; left: 12px; bottom: 12px; margin: 0;
       padding: 8px 10px; color: #dff; background: #071019dd;
@@ -175,7 +191,7 @@
     }
   </style>
 </head>
-<body>
+<body class="simulator-mode standalone-simulator">
   <div class="shell">
     <aside>
       <h1>Training runs</h1>
@@ -260,6 +276,12 @@
       </div>
     </main>
   </div>
+  <dialog id="settings" aria-labelledby="settingsTitle">
+    <h2 id="settingsTitle">Settings</h2>
+    <label for="sensitivity">Mouse sensitivity · <output id="sensitivityValue">100%</output></label>
+    <input id="sensitivity" type="range" min="10" max="300" step="5" value="100">
+    <button id="resumeSimulator">Back to simulator</button>
+  </dialog>
   <script src="simulator.js"></script>
   <script>
     const $ = id => document.getElementById(id);
@@ -858,7 +880,7 @@
     }
 
     function applyMouseLook(movementX, movementY) {
-      const sensitivity = 0.12 * Math.PI / 180;
+      const sensitivity = 0.12 * Number($('sensitivity').value) / 100 * Math.PI / 180;
       const yawDelta = movementX * sensitivity;
       const requestedPitch = movementY * sensitivity;
       state.live.cameraYaw += yawDelta;
@@ -870,7 +892,7 @@
     }
 
     function focusSimulatorInput() {
-      if (state.mode !== 'live') return;
+      if (state.mode !== 'live' || $('settings').open) return;
       try {
         $('simFrame').focus({preventScroll: true});
       } catch (_) {
@@ -879,7 +901,7 @@
     }
 
     function captureMouse() {
-      if (state.mode !== 'live') return;
+      if (state.mode !== 'live' || $('settings').open) return;
       focusSimulatorInput();
       if (document.pointerLockElement !== $('simFrame')) {
         if ($('simFrame').requestPointerLock) {
@@ -897,6 +919,7 @@
     }
 
     function enableFallbackMouse() {
+      if ($('settings').open) return;
       state.live.mouseFallback = true;
       document.body.classList.add('mouse-captured');
       $('captureMouse').textContent = 'Mouse active';
@@ -907,6 +930,18 @@
       if (document.pointerLockElement === $('simFrame')) document.exitPointerLock?.();
       document.body.classList.remove('mouse-captured');
       $('captureMouse').textContent = 'Capture mouse';
+    }
+
+    function openSettings() {
+      if ($('settings').open) return;
+      pauseSimulator();
+      $('settings').showModal();
+      releaseMouseCapture();
+    }
+
+    function closeSettings() {
+      $('settings').close();
+      focusSimulatorInput();
     }
 
     async function enterSimulatorExperience() {
@@ -1932,16 +1967,25 @@
     $('captureMouse').onclick = captureMouse;
     $('livePause').onclick = () => state.live.running ? pauseSimulator() : captureMouse();
     $('exitSimulator').onclick = exitSimulatorExperience;
+    $('sensitivity').oninput = event => {
+      $('sensitivityValue').textContent = `${event.target.value}%`;
+    };
+    $('resumeSimulator').onclick = () => { closeSettings(); captureMouse(); };
+    $('settings').addEventListener('cancel', event => {
+      event.preventDefault();
+      closeSettings();
+    });
     $('stepBack').onclick = () => { stop(); state.tickIndex = Math.max(0, state.tickIndex - 1); state.playhead = state.tickIndex; renderTick(0, true); };
     $('stepForward').onclick = () => { stop(); state.tickIndex = Math.min(state.selected.document.ticks.length - 1, state.tickIndex + 1); state.playhead = state.tickIndex; renderTick(0, true); };
     $('timeline').oninput = event => { stop(); state.tickIndex = Number(event.target.value) - 1; state.playhead = state.tickIndex; renderTick(0, true); };
     window.addEventListener('keydown', event => {
+      if ($('settings').open) return;
       if (event.target?.matches?.('input:not([type="range"]), textarea, select, [contenteditable="true"]')) return;
       if (event.code === 'KeyR' && event.metaKey) return;
       if (state.mode === 'live') {
         if (event.code === 'Escape') {
           event.preventDefault();
-          pauseSimulator();
+          if (!event.repeat) openSettings();
           return;
         }
         if (!liveKeyCodes.has(event.code)) return;
@@ -1972,6 +2016,7 @@
       }
     }, true);
     window.addEventListener('keyup', event => {
+      if ($('settings').open) return;
       if (event.code === 'KeyR' && event.metaKey) return;
       if (state.mode !== 'live' || !liveKeyCodes.has(event.code)) return;
       event.preventDefault();
@@ -1979,6 +2024,7 @@
       updateKeybinds();
     }, true);
     document.addEventListener('mousedown', event => {
+      if ($('settings').open) return;
       if (state.mode !== 'live' || (event.button !== 0 && event.button !== 2)) return;
       const mouseActive = document.pointerLockElement === $('simFrame')
         || state.live.mouseFallback;
@@ -2012,6 +2058,7 @@
       }
     });
     document.addEventListener('mousemove', event => {
+      if ($('settings').open) return;
       const mouseActive = document.pointerLockElement === $('simFrame')
         || state.live.mouseFallback;
       if (state.mode !== 'live' || !mouseActive) return;
@@ -2025,11 +2072,11 @@
       document.body.classList.toggle('mouse-captured', mouseActive);
       $('captureMouse').textContent = mouseActive ? 'Mouse active' : 'Capture mouse';
       if (!mouseActive && state.mode === 'live' && state.live.running) {
-        pauseSimulator('Paused · click the view to resume');
+        openSettings();
       }
     });
     document.addEventListener('pointerlockerror', () => {
-      if (state.mode !== 'live' || !document.hasFocus()) return;
+      if (state.mode !== 'live' || $('settings').open || !document.hasFocus()) return;
       enableFallbackMouse();
       focusSimulatorInput();
       startSimulator();
@@ -2050,7 +2097,7 @@
       '/simulator', '/simulator/', '/simulator.html', '/simulator/index.html',
     ].includes(location.pathname);
     if (standaloneSimulator) {
-      document.title = 'Bridge Simulator';
+      document.title = 'Bridging Simulator';
       document.body.classList.add('standalone-simulator');
       if (diagnosticsEnabled) {
         const diagnostics = document.createElement('output');
